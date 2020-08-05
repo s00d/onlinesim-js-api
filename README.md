@@ -4,7 +4,9 @@
 
 [npm](https://www.npmjs.com/package/onlinesim-js-api)
 
-js Api for onlinesim
+js Api for onlinesim for node and vanilla js
+
+ - full typescript support
 
 ## Installation
 
