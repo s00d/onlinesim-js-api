@@ -12,7 +12,7 @@ js Api for onlinesim for node and vanilla js
 
 Require this package in your `package.json` or install it by running:
 ```
-npm install onlinesim-api
+npm install onlinesim-js-api
 ```
 
 ## Documentation
