@@ -1,6 +1,8 @@
+[![npm version](https://badge.fury.io/js/onlinesim-js-api.svg)](https://badge.fury.io/js/onlinesim-js-api)
+
 # Onlinesim JS API
 
-[packagist](https://www.npmjs.com/package/onlinesim-js-api)
+[npm](https://www.npmjs.com/package/onlinesim-js-api)
 
 js Api for onlinesim
 
