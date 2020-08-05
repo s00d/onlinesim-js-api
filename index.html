@@ -3,20 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Examples for Onlinesim api</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.js"></script>
     <script src="./dist/index.bundle.js"></script>
 </head>
 <body>
 
-<h3><code>show tooltip</code></h3>
 <div id="example1" >
-    <button type="button" v-tooltip="{text: 'hello', position: 'right', width: 100}">test</button>
+    <button type="button" @click="showCoutries">RUN</button>
+
+    <table>
+        <tbody>
+        <tr>
+            <td v-for="(data, key) in countries">
+                <button v-text="data.country_text" @click="showNumbers(data.country)"></button>
+            </td>
+        </tr>
+        <tr>
+            <td v-for="(data, key) in numbers">
+                <button v-text="data.full_number" @click="showMessages(data.number)"></button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div v-for="(data, key) in messages">
+        <span v-text="data.in_number"></span>: <span v-text="data.text"></span>
+    </div>
+    <!-- DivTable.com -->
 </div>
 
 <script>
-  console.log(window.VueLiteTooltip);
-    Vue.use(window.VueLiteTooltip);
+    var driver = new window.OnlineSimDriver('').free()
     new Vue({
+        data() {
+            return {
+                countries: {},
+                numbers: {},
+                messages: {},
+            };
+        },
         el: '#example1',
+        methods: {
+            showCoutries: function () {
+                driver.countries().then((res) => {
+                    this.countries = res
+                });
+            },
+            showNumbers: function (country) {
+                driver.numbers(country).then((res) => {
+                    this.numbers = res
+                });
+            },
+            showMessages: function (number) {
+                driver.messages(number).then((res) => {
+                    this.messages = res
+                });
+            }
+        },
+
     });
 </script>
 
