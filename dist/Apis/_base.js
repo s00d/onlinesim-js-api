@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
 var Exceptions_1 = require("../Exceptions");
 var _base = (function () {
-    function _base(apiToken, dev_id, lang) {
+    function _base(apiToken, lang, dev_id) {
         this.token = apiToken;
         this.dev_id = dev_id;
         this.lang = lang;

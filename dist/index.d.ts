@@ -8,7 +8,7 @@ export default class OnlineSimDriver {
     private token;
     private dev_id;
     private lang;
-    constructor(apiToken: string, dev_id?: number | null, lang?: string);
+    constructor(apiToken: string, lang?: string, dev_id?: number | null);
     numbers(): GetNumbers;
     rent(): GetRent;
     proxy(): GetProxy;
