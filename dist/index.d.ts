@@ -6,7 +6,8 @@ import GetFree from "./Apis/GetFree";
 import GetForward from "./Apis/GetForward";
 export default class OnlineSimDriver {
     private token;
-    constructor(apiToken: string);
+    private dev_id;
+    constructor(apiToken: string, dev_id?: number | null);
     numbers(): GetNumbers;
     rent(): GetRent;
     proxy(): GetProxy;
