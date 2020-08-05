@@ -1,4 +1,4 @@
-import OnlineSimDriver from "./src";
+import OnlineSimDriver from "onlinesim-js-api/dist";
 
 const apikey = 'apikey';
 const driver = new OnlineSimDriver(apikey)
