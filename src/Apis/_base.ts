@@ -10,9 +10,10 @@ interface Resp {
 export default class _base {
   private token: string;
   private request: AxiosInstance;
-  private locale: 'ru'|'en' = 'ru';
-  constructor(apiToken: string, locale: 'ru'|'en' = 'ru') {
+  private dev_id: number|null;
+  constructor(apiToken: string, dev_id: number|null) {
     this.token = apiToken
+    this.dev_id = dev_id
     this.request = axios.create({
       baseURL: 'https://onlinesim.ru/api/'
     })
@@ -20,6 +21,9 @@ export default class _base {
 
   protected getRequest(url: string, params: {[key: string]: any } = {}) {
     params.apikey = this.token;
+    if(this.dev_id) {
+      params.dev_id = this.dev_id
+    }
     return this.request.get(url+'.php', {params: params}).then((response) => {
       const resp: Resp = response.data;
       if('response' in resp && resp.response.toString() !== '1') {
@@ -36,6 +40,9 @@ export default class _base {
 
   protected postRequest(url: string,  params: {[key: string]: any } = {}) {
     params.apikey = this.token;
+    if(this.dev_id) {
+      params.dev_id = this.dev_id
+    }
     return this.request.post(url+'.php', params).then((response) => {
       const resp: Resp = response.data;
       if('response' in resp && resp.response.toString() !== '1') {
