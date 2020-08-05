@@ -3,9 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = require("axios");
 var Exceptions_1 = require("../Exceptions");
 var _base = (function () {
-    function _base(apiToken, dev_id) {
+    function _base(apiToken, dev_id, lang) {
         this.token = apiToken;
         this.dev_id = dev_id;
+        this.lang = lang;
         this.request = axios_1.default.create({
             baseURL: 'https://onlinesim.ru/api/'
         });
@@ -13,6 +14,7 @@ var _base = (function () {
     _base.prototype.getRequest = function (url, params) {
         if (params === void 0) { params = {}; }
         params.apikey = this.token;
+        params.lang = this.lang;
         if (this.dev_id) {
             params.dev_id = this.dev_id;
         }
@@ -31,6 +33,7 @@ var _base = (function () {
     _base.prototype.postRequest = function (url, params) {
         if (params === void 0) { params = {}; }
         params.apikey = this.token;
+        params.lang = this.lang;
         if (this.dev_id) {
             params.dev_id = this.dev_id;
         }
