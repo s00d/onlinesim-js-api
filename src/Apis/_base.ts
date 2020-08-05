@@ -11,9 +11,11 @@ export default class _base {
   private token: string;
   private request: AxiosInstance;
   private dev_id: number|null;
-  constructor(apiToken: string, dev_id: number|null) {
+  private lang: string;
+  constructor(apiToken: string, dev_id: number|null, lang: string) {
     this.token = apiToken
     this.dev_id = dev_id
+    this.lang = lang
     this.request = axios.create({
       baseURL: 'https://onlinesim.ru/api/'
     })
@@ -21,6 +23,7 @@ export default class _base {
 
   protected getRequest(url: string, params: {[key: string]: any } = {}) {
     params.apikey = this.token;
+    params.lang = this.lang;
     if(this.dev_id) {
       params.dev_id = this.dev_id
     }
@@ -40,6 +43,7 @@ export default class _base {
 
   protected postRequest(url: string,  params: {[key: string]: any } = {}) {
     params.apikey = this.token;
+    params.lang = this.lang;
     if(this.dev_id) {
       params.dev_id = this.dev_id
     }
