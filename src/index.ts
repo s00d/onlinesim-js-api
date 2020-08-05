@@ -9,34 +9,34 @@ export default class OnlineSimDriver {
   private token: string;
   private dev_id: number|null;
   private lang: string;
-  constructor(apiToken: string, dev_id: number|null = null, lang = 'en') {
+  constructor(apiToken: string, lang = 'en', dev_id: number|null = null) {
     this.token = apiToken
     this.dev_id = dev_id
     this.lang = lang
   }
 
   numbers() {
-    return new GetNumbers(this.token, this.dev_id, this.lang)
+    return new GetNumbers(this.token, this.lang, this.dev_id)
   }
 
   rent() {
-    return new GetRent(this.token, this.dev_id, this.lang)
+    return new GetRent(this.token, this.lang, this.dev_id)
   }
 
   proxy() {
-    return new GetProxy(this.token, this.dev_id, this.lang)
+    return new GetProxy(this.token, this.lang, this.dev_id)
   }
 
   user() {
-    return new GetUser(this.token, this.dev_id, this.lang)
+    return new GetUser(this.token, this.lang, this.dev_id)
   }
 
   free() {
-    return new GetFree(this.token, this.dev_id, this.lang)
+    return new GetFree(this.token, this.lang, this.dev_id)
   }
 
   forward() {
-    return new GetForward(this.token, this.dev_id, this.lang)
+    return new GetForward(this.token, this.lang, this.dev_id)
   }
 }
 

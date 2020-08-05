@@ -12,7 +12,7 @@ export default class _base {
   private request: AxiosInstance;
   private dev_id: number|null;
   private lang: string;
-  constructor(apiToken: string, dev_id: number|null, lang: string) {
+  constructor(apiToken: string, lang: string, dev_id: number|null) {
     this.token = apiToken
     this.dev_id = dev_id
     this.lang = lang
