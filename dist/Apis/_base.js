@@ -8,7 +8,8 @@ var _base = (function () {
         this.dev_id = dev_id;
         this.lang = lang;
         this.request = axios_1.default.create({
-            baseURL: 'https://onlinesim.ru/api/'
+            baseURL: 'https://onlinesim.ru/api/',
+            headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36' }
         });
     }
     _base.prototype.getRequest = function (url, params) {
