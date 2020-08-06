@@ -35,7 +35,7 @@ export default class GetUser extends _base {
 
   profile(): Promise<User> {
     return this.getRequest('getProfile', {income: true}).then((res) => {
-      return res
+      return res.profile
     })
   }
 }
