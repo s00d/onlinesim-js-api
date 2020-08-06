@@ -26,6 +26,9 @@ interface TariffCountryOne {
         };
     };
 }
+interface callbackType {
+    (code: string | null): void;
+}
 export default class GetNumbers extends _base {
     price(service: string, country?: number): Promise<string>;
     get(service: string, country?: number, reject?: Array<number>, extension?: boolean): Promise<number>;
@@ -40,5 +43,6 @@ export default class GetNumbers extends _base {
     tariffsOne(country?: number): Promise<TariffCountryOne>;
     service(): Promise<Array<string>>;
     serviceNumber(service: string): Promise<Array<string>>;
+    wait_code(tzid: number, timeout?: number, callback?: null | callbackType, not_end?: boolean): Promise<string>;
 }
 export {};

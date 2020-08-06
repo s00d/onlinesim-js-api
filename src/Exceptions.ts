@@ -40,11 +40,11 @@ export class RequestException extends Error {
     SERVICE_TO_NUMBER_EMPTY: 'no numbers for repeated reception for this service',
   }
 
-  constructor (error?: string) {
+  constructor (error?: string, text = null) {
     super(error)
-    if(error && error in RequestException.errors) {
+    if(!text && error && error in RequestException.errors) {
       // @ts-ignore
-      super(RequestException.errors[error])
+      throw new RequestException(error, RequestException.errors[error])
     }
 
     Error.captureStackTrace(this, RequestException);

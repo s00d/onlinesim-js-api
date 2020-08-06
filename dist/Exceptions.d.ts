@@ -38,5 +38,5 @@ export declare class RequestException extends Error {
         ERROR_NO_SERVICE_REPEAT: string;
         SERVICE_TO_NUMBER_EMPTY: string;
     };
-    constructor(error?: string);
+    constructor(error?: string, text?: null);
 }

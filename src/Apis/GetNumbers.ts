@@ -27,6 +27,8 @@ interface TariffCountryOne {
     }}
 }
 
+interface callbackType { (code: string|null): void }
+
 export default class GetNumbers extends _base {
   price(service: string, country = 7): Promise<string> {
     return this.getRequest('getPrice', {service, country}).then((resp) => {
@@ -94,5 +96,33 @@ export default class GetNumbers extends _base {
     return this.getRequest('getServiceNumber', {service}).then((resp) => {
       return resp.number
     })
+  }
+
+  async wait_code(tzid: number, timeout= 10, callback: null|callbackType = null, not_end: boolean=false): Promise<string> {
+    let __last_code: string = ''
+    let counter = 0
+    while (true) {
+      await setTimeout(() => {}, timeout)
+      counter += 1
+      if (counter >= 10) {
+        throw new Error('Timeout error')
+      }
+      const response = await this.stateOne(tzid)
+
+      if ('code' in response && !not_end && response['code'] != __last_code) {
+        __last_code = response['code']
+        await this.close(tzid)
+        break;
+      } else if('code' in response && not_end && response['code'] != __last_code) {
+        __last_code = response['code']
+        await this.next(tzid)
+        break
+      }
+    }
+
+    if (callback) {
+      callback(__last_code)
+    }
+    return __last_code
   }
 }

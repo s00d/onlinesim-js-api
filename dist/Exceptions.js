@@ -24,10 +24,11 @@ var NoNumberException = (function (_super) {
 exports.NoNumberException = NoNumberException;
 var RequestException = (function (_super) {
     __extends(RequestException, _super);
-    function RequestException(error) {
+    function RequestException(error, text) {
+        if (text === void 0) { text = null; }
         var _this = _super.call(this, error) || this;
-        if (error && error in RequestException.errors) {
-            _this = _super.call(this, RequestException.errors[error]) || this;
+        if (!text && error && error in RequestException.errors) {
+            throw new RequestException(error, RequestException.errors[error]);
         }
         Error.captureStackTrace(_this, RequestException);
         return _this;

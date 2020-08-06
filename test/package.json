@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "onlinesim-js-api": "^1.0.4"
+    "onlinesim-js-api": "^1.0.5"
   }
 }
