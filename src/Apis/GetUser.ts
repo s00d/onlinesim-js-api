@@ -15,8 +15,7 @@ interface User {
   verify: number;
   block: number;
   payment: {
-    balance: number,
-    zbalance: number,
+    payment: number,
     income: number,
     spent: number,
     now: number,
