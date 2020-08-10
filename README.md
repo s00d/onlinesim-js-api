@@ -2,7 +2,7 @@
 
 # Onlinesim JS API
 
-js Api for onlinesim for node and vanilla js
+Wrapper for automatic reception of SMS-messages by onlinesim.ru for node and vanilla js
 
  - full typescript support
 
