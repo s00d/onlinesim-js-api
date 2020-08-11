@@ -30,7 +30,7 @@ var GetUser = (function (_super) {
     };
     GetUser.prototype.profile = function () {
         return this.getRequest('getProfile', { income: true }).then(function (res) {
-            return res;
+            return res.profile;
         });
     };
     return GetUser;
