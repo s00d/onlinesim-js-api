@@ -1,5 +1,5 @@
 import _base from "./_base";
-interface StateOne {
+export interface StateOne {
     tzid: number;
     response: string;
     number: number;
@@ -9,7 +9,7 @@ interface StateOne {
     extend: number;
     country: number;
 }
-interface ForwardingListOne {
+export interface ForwardingListOne {
     id: number;
     id_number: string;
     group: string;
@@ -26,7 +26,7 @@ interface ForwardingListOne {
     company_id: string;
     service: string;
 }
-interface CallListOne {
+export interface CallListOne {
     id: number;
     number_forward_client: string;
     number_forward: string;
@@ -48,4 +48,3 @@ export default class GetForward extends _base {
     remove(tzid: number): Promise<boolean>;
     callList(number: number, count?: number, page?: number, orderby?: 'ASC' | 'DESC'): Promise<Array<CallListOne>>;
 }
-export {};

@@ -1,3 +1,8 @@
+export interface Resp {
+    response: number | string;
+    [key: string]: any;
+    [key: number]: any;
+}
 export default class _base {
     private token;
     private request;

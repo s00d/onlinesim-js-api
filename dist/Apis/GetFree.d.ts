@@ -1,9 +1,9 @@
 import _base from "./_base";
-interface GetCountriesOne {
+export interface GetCountriesOne {
     country: number;
     country_text: string;
 }
-interface GetNumbersOne {
+export interface GetNumbersOne {
     maxdate: string;
     number: string;
     country: number;
@@ -12,7 +12,7 @@ interface GetNumbersOne {
     full_number: string;
     country_text: string;
 }
-interface GetMessagesOne {
+export interface GetMessagesOne {
     text: string;
     in_number: string;
     my_number: number;
@@ -24,4 +24,3 @@ export default class GetFree extends _base {
     numbers(country: number): Promise<Array<GetNumbersOne>>;
     messages(phone: number, page?: number): Promise<Array<GetMessagesOne>>;
 }
-export {};

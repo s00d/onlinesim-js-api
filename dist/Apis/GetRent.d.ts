@@ -1,5 +1,5 @@
 import _base from "./_base";
-interface Get {
+export interface Get {
     tzid: number;
     status: number;
     messages: Array<{
@@ -23,7 +23,7 @@ interface Get {
     reload: number;
     day_extend: number;
 }
-interface Tariff {
+export interface Tariff {
     code: number;
     enabled: boolean;
     name: string;
@@ -49,4 +49,3 @@ export default class GetRent extends _base {
     tariffsOne(country?: number): Promise<Tariff>;
     close(tzid: number): Promise<boolean>;
 }
-export {};

@@ -1,5 +1,5 @@
 import _base from "./_base";
-interface Get {
+export interface Get {
     type: string;
     connect_type: string;
     host: string;
@@ -28,7 +28,39 @@ interface Get {
     change_type: boolean;
     rotate: boolean;
 }
+export interface Tariff {
+    days: {
+        config: {
+            [type: string]: {
+                type: string;
+                enabled: boolean;
+                days: {
+                    [count: number]: number;
+                };
+            };
+        };
+        operators: Array<string>;
+        connect: Array<string>;
+    };
+    traffic: {
+        config: {
+            [code: string]: {
+                name: string;
+                cities: {
+                    [name: string]: string;
+                };
+                operators: {
+                    [code: string]: string;
+                };
+            };
+        };
+        price: {
+            [tariff: string]: number;
+        };
+    };
+}
 export default class GetProxy extends _base {
+    tariffs(): Promise<Tariff>;
     get(cl?: 'days' | 'traffic', type?: 'shared' | 'sharednowait' | 'private' | 'privatenowait' | 'multiport', connect?: 'https' | 'socks', count?: number, operator?: 'mts' | 'megafon' | 'beeline' | 'tele2' | null, country?: number, city?: string, port_count?: number, session?: boolean): Promise<Get>;
     state(orderby?: 'ASC' | 'DESC'): Promise<Array<Get>>;
     stateOne(tzid: number): Promise<Get>;
@@ -36,4 +68,3 @@ export default class GetProxy extends _base {
     changeType(tzid: number): Promise<string>;
     setComment(tzid: number, comment?: string): Promise<boolean>;
 }
-export {};

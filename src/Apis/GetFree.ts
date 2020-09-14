@@ -1,11 +1,11 @@
 import _base from "./_base";
 
-interface GetCountriesOne {
+export interface GetCountriesOne {
   country: number,
   country_text: string,
 }
 
-interface GetNumbersOne {
+export interface GetNumbersOne {
   maxdate: string;
   number: string;
   country: number;
@@ -15,7 +15,7 @@ interface GetNumbersOne {
   country_text: string;
 }
 
-interface GetMessagesOne {
+export interface GetMessagesOne {
   text: string;
   in_number: string;
   my_number: number;

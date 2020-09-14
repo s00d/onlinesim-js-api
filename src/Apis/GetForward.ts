@@ -1,6 +1,6 @@
 import _base from "./_base";
 
-interface StateOne {
+export interface StateOne {
   tzid: number;
   response: string;
   number: number;
@@ -11,7 +11,7 @@ interface StateOne {
   country: number;
 }
 
-interface ForwardingListOne {
+export interface ForwardingListOne {
   id: number;
   id_number: string;
   group: string;
@@ -29,7 +29,7 @@ interface ForwardingListOne {
   service: string;
 }
 
-interface CallListOne {
+export interface CallListOne {
   id: number;
   number_forward_client: string;
   number_forward: string;

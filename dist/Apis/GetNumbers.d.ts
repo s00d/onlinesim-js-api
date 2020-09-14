@@ -1,5 +1,5 @@
 import _base from "./_base";
-interface StateOne {
+export interface StateOne {
     tzid: number;
     response: string;
     number: number;
@@ -9,7 +9,7 @@ interface StateOne {
     extend: number;
     country: number;
 }
-interface TariffCountryOne {
+export interface TariffCountryOne {
     name: string;
     position: number;
     code: number;
