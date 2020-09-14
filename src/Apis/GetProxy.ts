@@ -1,6 +1,6 @@
 import _base from "./_base";
 
-interface Get {
+export interface Get {
   type: string;
   connect_type: string;
   host: string;
@@ -30,7 +30,39 @@ interface Get {
   rotate:boolean;
 }
 
+
+export interface Tariff {
+  days: {
+    config: {[type: string]: {
+        type: string,
+        enabled: boolean,
+        days: {[count: number]: number}
+    }},
+    operators: Array<string>,
+    connect: Array<string>,
+  },
+  traffic: {
+    config: {
+      [code: string]: {
+        name: string
+        cities: {[name: string]: string}
+        operators: {[code: string]: string}
+      },
+    },
+    price: {[tariff: string]: number}
+  }
+}
+
+
+
 export default class GetProxy extends _base {
+  tariffs(): Promise<Tariff> {
+    return this.getRequest('proxy/tariffs', {}).then((resp) => {
+      return resp
+    })
+  }
+
+
   get(cl:'days'|'traffic' = 'days', type:'shared'|'sharednowait'|'private'|'privatenowait'|'multiport' = 'private', connect:'https'|'socks' = 'https', count = 1, operator:'mts'|'megafon'|'beeline'|'tele2'|null = null, country = 7, city = 'any', port_count = 1, session = true): Promise<Get> {
     return this.getRequest('proxy/getProxy', {class: cl, type,connect,count,operator,country,city,port_count,session}).then((resp) => {
       return resp.item
@@ -66,4 +98,5 @@ export default class GetProxy extends _base {
       return true
     })
   }
+
 }

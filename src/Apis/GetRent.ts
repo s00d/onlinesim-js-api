@@ -1,6 +1,6 @@
 import _base from "./_base";
 
-interface Get {
+export interface Get {
   tzid: number;
   status: number;
   messages: Array<{id:number, service:string, text:string,code:string,created_at:string}>;
@@ -17,7 +17,7 @@ interface Get {
   day_extend: number;
 }
 
-interface Tariff {
+export interface Tariff {
   code: number;
   enabled: boolean;
   name: string;

@@ -1,7 +1,7 @@
 import axios, {AxiosInstance, AxiosResponse} from "axios";
 import {NoNumberException, RequestException} from "../Exceptions";
 
-interface Resp {
+export interface Resp {
   response: number|string
   [key: string]: any
   [key: number]: any

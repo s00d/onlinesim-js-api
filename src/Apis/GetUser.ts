@@ -1,6 +1,6 @@
 import _base from "./_base";
 
-interface User {
+export interface User {
   id: number;
   name: string;
   username: string;

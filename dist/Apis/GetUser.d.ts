@@ -1,5 +1,5 @@
 import _base from "./_base";
-interface User {
+export interface User {
     id: number;
     name: string;
     username: string;
@@ -28,4 +28,3 @@ export default class GetUser extends _base {
     }>;
     profile(): Promise<User>;
 }
-export {};

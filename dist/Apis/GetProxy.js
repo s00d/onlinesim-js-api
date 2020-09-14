@@ -19,6 +19,11 @@ var GetProxy = (function (_super) {
     function GetProxy() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    GetProxy.prototype.tariffs = function () {
+        return this.getRequest('proxy/tariffs', {}).then(function (resp) {
+            return resp;
+        });
+    };
     GetProxy.prototype.get = function (cl, type, connect, count, operator, country, city, port_count, session) {
         if (cl === void 0) { cl = 'days'; }
         if (type === void 0) { type = 'private'; }
