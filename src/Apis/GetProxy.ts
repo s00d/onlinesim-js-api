@@ -63,7 +63,7 @@ export default class GetProxy extends _base {
   }
 
 
-  get(cl:'days'|'traffic' = 'days', type:'shared'|'sharednowait'|'private'|'privatenowait'|'multiport' = 'private', connect:'https'|'socks' = 'https', count = 1, operator:'mts'|'megafon'|'beeline'|'tele2'|null = null, country = 7, city = 'any', port_count = 1, session = true): Promise<Get> {
+  get(cl:'days'|'traffic' = 'days', type:'shared'|'sharednowait'|'private'|'privatenowait'|'multiport' = 'private', connect:'https'|'socks' = 'https', count = 1, operator:'mts'|'megafon'|'beeline'|'tele2'|null = null, country = 'any', city = 'any', port_count = 1, session = true): Promise<Get> {
     return this.getRequest('proxy/getProxy', {class: cl, type,connect,count,operator,country,city,port_count,session}).then((resp) => {
       return resp.item
     })
