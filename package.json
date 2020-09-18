@@ -1,6 +1,6 @@
 {
   "name": "onlinesim-js-api",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Library for OnlineSim Api",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,7 +36,8 @@
   "author": "s00d",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2"
+    "axios": "^0.19.2",
+    "intro-ts": "^1.1.10"
   },
   "files": [
     "dist"
