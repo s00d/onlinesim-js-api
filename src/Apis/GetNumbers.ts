@@ -98,8 +98,12 @@ export default class GetNumbers extends _base {
     })
   }
 
-  async wait_code(tzid: number, timeout= 10, callback: null|callbackType = null, not_end: boolean=false): Promise<string> {
+  async wait_code(tzid: number, timeout= 10, callback: null|callbackType = null, not_end: boolean=false, full_message: boolean=false): Promise<string> {
     let __last_code: string = ''
+    let _response_type: number = 1
+    if (full_message) {
+      _response_type = 0
+    }
     let counter = 0
     while (true) {
       await setTimeout(() => {}, timeout)
@@ -107,14 +111,14 @@ export default class GetNumbers extends _base {
       if (counter >= 10) {
         throw new Error('Timeout error')
       }
-      const response = await this.stateOne(tzid)
+      const response = await this.stateOne(tzid, _response_type, false)
 
-      if ('code' in response && !not_end && response['code'] != __last_code) {
-        __last_code = response['code']
+      if ('msg' in response && !not_end && response['msg'] != __last_code) {
+        __last_code = response['msg']
         await this.close(tzid)
         break;
-      } else if('code' in response && not_end && response['code'] != __last_code) {
-        __last_code = response['code']
+      } else if('msg' in response && not_end && response['msg'] != __last_code) {
+        __last_code = response['msg']
         await this.next(tzid)
         break
       }
