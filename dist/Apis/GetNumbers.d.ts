@@ -36,6 +36,7 @@ export default class GetNumbers extends _base {
     stateOne(tzid: number, message_to_code?: number, msg_list?: boolean, clean?: boolean, repeat?: boolean): Promise<StateOne>;
     next(tzid: number): Promise<boolean>;
     close(tzid: number): Promise<boolean>;
+    ban(tzid: number): Promise<boolean>;
     repeat(service: string, number: number): Promise<number>;
     tariffs(): Promise<{
         [country: string]: TariffCountryOne;
@@ -43,6 +44,6 @@ export default class GetNumbers extends _base {
     tariffsOne(country?: number): Promise<TariffCountryOne>;
     service(): Promise<Array<string>>;
     serviceNumber(service: string): Promise<Array<string>>;
-    wait_code(tzid: number, timeout?: number, callback?: null | callbackType, not_end?: boolean): Promise<string>;
+    wait_code(tzid: number, timeout?: number, callback?: null | callbackType, not_end?: boolean, full_message?: boolean): Promise<string>;
 }
 export {};

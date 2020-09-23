@@ -100,6 +100,11 @@ var GetNumbers = (function (_super) {
             return true;
         });
     };
+    GetNumbers.prototype.ban = function (tzid) {
+        return this.getRequest('setOperationOk', { tzid: tzid, ban: 1 }).then(function (resp) {
+            return true;
+        });
+    };
     GetNumbers.prototype.repeat = function (service, number) {
         return this.getRequest('getNumRepeat', { service: service, number: number }).then(function (resp) {
             return resp.tzid;
@@ -126,16 +131,21 @@ var GetNumbers = (function (_super) {
             return resp.number;
         });
     };
-    GetNumbers.prototype.wait_code = function (tzid, timeout, callback, not_end) {
+    GetNumbers.prototype.wait_code = function (tzid, timeout, callback, not_end, full_message) {
         if (timeout === void 0) { timeout = 10; }
         if (callback === void 0) { callback = null; }
         if (not_end === void 0) { not_end = false; }
+        if (full_message === void 0) { full_message = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var __last_code, counter, response;
+            var __last_code, _response_type, counter, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         __last_code = '';
+                        _response_type = 1;
+                        if (full_message) {
+                            _response_type = 0;
+                        }
                         counter = 0;
                         _a.label = 1;
                     case 1:
@@ -147,18 +157,18 @@ var GetNumbers = (function (_super) {
                         if (counter >= 10) {
                             throw new Error('Timeout error');
                         }
-                        return [4, this.stateOne(tzid)];
+                        return [4, this.stateOne(tzid, _response_type, false)];
                     case 3:
                         response = _a.sent();
-                        if (!('code' in response && !not_end && response['code'] != __last_code)) return [3, 5];
-                        __last_code = response['code'];
+                        if (!('msg' in response && !not_end && response['msg'] != __last_code)) return [3, 5];
+                        __last_code = response['msg'];
                         return [4, this.close(tzid)];
                     case 4:
                         _a.sent();
                         return [3, 8];
                     case 5:
-                        if (!('code' in response && not_end && response['code'] != __last_code)) return [3, 7];
-                        __last_code = response['code'];
+                        if (!('msg' in response && not_end && response['msg'] != __last_code)) return [3, 7];
+                        __last_code = response['msg'];
                         return [4, this.next(tzid)];
                     case 6:
                         _a.sent();
