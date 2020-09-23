@@ -68,6 +68,12 @@ export default class GetNumbers extends _base {
     })
   }
 
+  ban(tzid: number): Promise<boolean> {
+    return this.getRequest('setOperationOk', {tzid, ban: 1}).then((resp) => {
+      return true
+    })
+  }
+
   repeat(service: string, number: number): Promise<number> {
     return this.getRequest('getNumRepeat', {service, number}).then((resp) => {
       return resp.tzid
