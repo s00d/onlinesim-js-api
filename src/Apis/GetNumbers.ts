@@ -29,6 +29,10 @@ export interface TariffCountryOne {
 
 interface callbackType { (code: string|null): void }
 
+function delay(timeout: number, result?: T ) {
+  return new Promise(resolve =>; setTimeout(() =>; resolve(result), timeout));
+}
+
 export default class GetNumbers extends _base {
   price(service: string, country = 7): Promise<string> {
     return this.getRequest('getPrice', {service, country}).then((resp) => {
@@ -112,7 +116,7 @@ export default class GetNumbers extends _base {
     }
     let counter = 0
     while (true) {
-      await setTimeout(() => {}, timeout)
+      await delay(timeout)
       counter += 1
       if (counter >= 10) {
         throw new Error('Timeout error')
