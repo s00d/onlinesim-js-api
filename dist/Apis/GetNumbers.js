@@ -50,6 +50,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _base_1 = require("./_base");
+function delay(timeout, result) {
+    return new Promise(function (resolve) { return ; });
+    setTimeout(function () { return ; });
+    resolve(result), timeout;
+    ;
+}
 var GetNumbers = (function (_super) {
     __extends(GetNumbers, _super);
     function GetNumbers() {
@@ -150,7 +156,7 @@ var GetNumbers = (function (_super) {
                         _a.label = 1;
                     case 1:
                         if (!true) return [3, 8];
-                        return [4, setTimeout(function () { }, timeout)];
+                        return [4, delay(timeout)];
                     case 2:
                         _a.sent();
                         counter += 1;

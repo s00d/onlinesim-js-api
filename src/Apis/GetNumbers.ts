@@ -29,8 +29,8 @@ export interface TariffCountryOne {
 
 interface callbackType { (code: string|null): void }
 
-function delay(timeout: number, result?: T ) {
-  return new Promise(resolve =>; setTimeout(() =>; resolve(result), timeout));
+function delay(timeout: number, result?: any ) {
+  return new Promise(resolve => setTimeout(() => resolve(result), timeout));
 }
 
 export default class GetNumbers extends _base {
