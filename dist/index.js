@@ -8,6 +8,7 @@ var GetFree_1 = require("./Apis/GetFree");
 var GetForward_1 = require("./Apis/GetForward");
 var OnlineSimDriver = (function () {
     function OnlineSimDriver(apiToken, lang, dev_id) {
+        if (apiToken === void 0) { apiToken = null; }
         if (lang === void 0) { lang = 'en'; }
         if (dev_id === void 0) { dev_id = null; }
         this.oauth = null;

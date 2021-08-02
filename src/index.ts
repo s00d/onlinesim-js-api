@@ -6,13 +6,13 @@ import GetFree from "./Apis/GetFree";
 import GetForward from "./Apis/GetForward";
 
 export default class OnlineSimDriver {
-  private token: string;
+  private token: string|null;
   private dev_id: number|null;
   private lang: string;
   private oauth: null|string = null;
   private base: string = 'https://onlinesim.ru/api/';
 
-  constructor(apiToken: string, lang = 'en', dev_id: number|null = null) {
+  constructor(apiToken: string|null = null, lang = 'en', dev_id: number|null = null) {
     this.token = apiToken
     this.dev_id = dev_id
     this.lang = lang
