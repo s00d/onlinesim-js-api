@@ -9,12 +9,30 @@ var _base = (function () {
         this.lang = lang;
         this.request = axios_1.default.create({
             baseURL: 'https://onlinesim.ru/api/',
-            headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36' }
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36'
+            }
         });
     }
+    _base.prototype.createRequest = function (token, base) {
+        if (base === void 0) { base = 'https://onlinesim.ru/api/'; }
+        var headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36'
+        };
+        if (token) {
+            headers['Authorization'] = 'Bearer ' + token;
+        }
+        this.request = axios_1.default.create({
+            baseURL: base,
+            headers: headers
+        });
+        return this;
+    };
     _base.prototype.getRequest = function (url, params) {
         if (params === void 0) { params = {}; }
-        params.apikey = this.token;
+        if (this.token) {
+            params.apikey = this.token;
+        }
         params.lang = this.lang;
         if (this.dev_id) {
             params.dev_id = this.dev_id;

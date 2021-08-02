@@ -8,7 +8,8 @@ export default class _base {
     private request;
     private dev_id;
     private lang;
-    constructor(apiToken: string, lang: string, dev_id: number | null);
+    constructor(apiToken: string | null, lang: string, dev_id: number | null);
+    createRequest(token: string | null, base?: string): this;
     protected getRequest(url: string, params?: {
         [key: string]: any;
     }): Promise<any>;
