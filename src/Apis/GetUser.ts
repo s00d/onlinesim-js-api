@@ -114,7 +114,7 @@ export default class GetUser extends _base {
   }
 
   createEmpty(params: {[key:string]: any}): Promise<Pay> {
-    return this.getRequest('createEmpty', params, false).then((res) => {
+    return this.getRequest('pay/createEmpty', params, false).then((res) => {
       return res
     })
   }

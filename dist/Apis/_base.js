@@ -28,8 +28,9 @@ var _base = (function () {
         });
         return this;
     };
-    _base.prototype.getRequest = function (url, params) {
+    _base.prototype.getRequest = function (url, params, suf) {
         if (params === void 0) { params = {}; }
+        if (suf === void 0) { suf = true; }
         if (this.token) {
             params.apikey = this.token;
         }
@@ -37,7 +38,8 @@ var _base = (function () {
         if (this.dev_id) {
             params.dev_id = this.dev_id;
         }
-        return this.request.get(url + '.php', { params: params }).then(function (response) {
+        var ssuf = suf ? '.php' : '';
+        return this.request.get(url + ssuf, { params: params }).then(function (response) {
             var resp = response.data;
             if ('response' in resp && resp.response.toString() !== '1') {
                 if (resp.response.toString() === 'NO_NUMBER' || resp.response.toString() === 'NO_NUMBER_FOR_FORWARD') {
