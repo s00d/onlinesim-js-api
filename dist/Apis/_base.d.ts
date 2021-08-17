@@ -12,7 +12,7 @@ export default class _base {
     createRequest(token: string | null, base?: string): this;
     protected getRequest(url: string, params?: {
         [key: string]: any;
-    }): Promise<any>;
+    }, suf?: boolean): Promise<any>;
     protected postRequest(url: string, params?: {
         [key: string]: any;
     }): Promise<any>;
