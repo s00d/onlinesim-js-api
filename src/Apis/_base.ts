@@ -39,7 +39,7 @@ export default class _base {
     return this;
   }
 
-  protected getRequest(url: string, params: {[key: string]: any } = {}) {
+  protected getRequest(url: string, params: {[key: string]: any } = {}, suf = true) {
     if(this.token) {
       params.apikey = this.token
     }
@@ -47,7 +47,9 @@ export default class _base {
     if(this.dev_id) {
       params.dev_id = this.dev_id
     }
-    return this.request.get(url+'.php', {params: params}).then((response) => {
+
+    let ssuf = suf ? '.php' : ''
+    return this.request.get(url+ssuf, {params: params}).then((response) => {
       const resp: Resp = response.data;
       if('response' in resp && resp.response.toString() !== '1') {
         if(resp.response.toString() === 'NO_NUMBER' ||resp.response.toString() === 'NO_NUMBER_FOR_FORWARD') {
