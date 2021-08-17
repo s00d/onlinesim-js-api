@@ -35,6 +35,16 @@ var GetUser = (function (_super) {
             return res.profile;
         });
     };
+    GetUser.prototype.getPaymentHistory = function () {
+        return this.getRequest('getPaymentHistory').then(function (res) {
+            return res;
+        });
+    };
+    GetUser.prototype.createEmpty = function (params) {
+        return this.getRequest('pay/createEmpty', params, false).then(function (res) {
+            return res;
+        });
+    };
     return GetUser;
 }(_base_1.default));
 exports.default = GetUser;
