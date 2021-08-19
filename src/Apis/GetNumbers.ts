@@ -46,7 +46,7 @@ export default class GetNumbers extends _base {
     })
   }
 
-  getWithNumber(service: string, country = 7, reject: Array<number> = [], extension = false): Promise<{tzid: number, number: number, country: number}> {
+  getWithNumber(service: string, country = 7, reject: Array<number> = [], extension = false): Promise<{tzid: number, number: string, country: number}> {
     return this.getRequest('getNum', {service, country, reject, extension, number: true}).then((resp) => {
       return {tzid: resp.tzid, number: resp.number, country: country}
     })

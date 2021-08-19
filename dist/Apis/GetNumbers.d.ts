@@ -34,7 +34,7 @@ export default class GetNumbers extends _base {
     get(service: string, country?: number, reject?: Array<number>, extension?: boolean): Promise<number>;
     getWithNumber(service: string, country?: number, reject?: Array<number>, extension?: boolean): Promise<{
         tzid: number;
-        number: number;
+        number: string;
         country: number;
     }>;
     state(message_to_code?: number, orderby?: 'ASC' | 'DESC', msg_list?: boolean, clean?: boolean, repeat?: boolean): Promise<Array<StateOne>>;
