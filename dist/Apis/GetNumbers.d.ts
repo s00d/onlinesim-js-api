@@ -32,6 +32,11 @@ interface callbackType {
 export default class GetNumbers extends _base {
     price(service: string, country?: number): Promise<string>;
     get(service: string, country?: number, reject?: Array<number>, extension?: boolean): Promise<number>;
+    getWithNumber(service: string, country?: number, reject?: Array<number>, extension?: boolean): Promise<{
+        tzid: number;
+        number: number;
+        country: number;
+    }>;
     state(message_to_code?: number, orderby?: 'ASC' | 'DESC', msg_list?: boolean, clean?: boolean, repeat?: boolean): Promise<Array<StateOne>>;
     stateOne(tzid: number, message_to_code?: number, msg_list?: boolean, clean?: boolean, repeat?: boolean): Promise<StateOne>;
     next(tzid: number): Promise<boolean>;

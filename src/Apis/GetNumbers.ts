@@ -46,6 +46,12 @@ export default class GetNumbers extends _base {
     })
   }
 
+  getWithNumber(service: string, country = 7, reject: Array<number> = [], extension = false): Promise<{tzid: number, number: number, country: number}> {
+    return this.getRequest('getNum', {service, country, reject, extension, number: true}).then((resp) => {
+      return {tzid: resp.tzid, number: resp.number, country: country}
+    })
+  }
+
   state(message_to_code = 1, orderby:'ASC'|'DESC' = 'ASC', msg_list = true, clean = true, repeat = false): Promise<Array<StateOne>> {
     return this.getRequest('getState', {message_to_code, orderby, msg_list:msg_list?1:0, clean:clean?1:0, type: repeat?'repeat':'index'})
       .then((resp) => {
