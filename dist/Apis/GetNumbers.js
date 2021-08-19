@@ -74,6 +74,14 @@ var GetNumbers = (function (_super) {
             return resp.tzid;
         });
     };
+    GetNumbers.prototype.getWithNumber = function (service, country, reject, extension) {
+        if (country === void 0) { country = 7; }
+        if (reject === void 0) { reject = []; }
+        if (extension === void 0) { extension = false; }
+        return this.getRequest('getNum', { service: service, country: country, reject: reject, extension: extension, number: true }).then(function (resp) {
+            return { tzid: resp.tzid, number: resp.number, country: country };
+        });
+    };
     GetNumbers.prototype.state = function (message_to_code, orderby, msg_list, clean, repeat) {
         if (message_to_code === void 0) { message_to_code = 1; }
         if (orderby === void 0) { orderby = 'ASC'; }
