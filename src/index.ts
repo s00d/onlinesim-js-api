@@ -10,7 +10,7 @@ export default class OnlineSimDriver {
   private dev_id: number|null;
   private lang: string;
   private oauth: null|string = null;
-  private base: string = 'https://onlinesim.ru/api/';
+  private base: string = 'https://onlinesim.host/api/';
 
   constructor(apiToken: string|null = null, lang = 'en', dev_id: number|null = null) {
     this.token = apiToken
@@ -18,7 +18,7 @@ export default class OnlineSimDriver {
     this.lang = lang
   }
 
-  setBase(base = 'https://onlinesim.ru/api/') {
+  setBase(base = 'https://onlinesim.host/api/') {
     this.base = base
     return this;
   }
