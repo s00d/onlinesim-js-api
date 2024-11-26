@@ -31,10 +31,6 @@ jobs:
       - name: install deps
         run: npm i
 
-      - name: prepack
-        run: npm run prepack
-
-
       # run build script
       - name: Build VitePress site
         run: npm run docs:build
