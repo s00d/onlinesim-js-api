@@ -29,7 +29,7 @@ export interface Tariff {
 }
 
 
-export default class GetRent extends _base {
+export class GetRent extends _base {
   get(country = 7, days = 1, extension = false): Promise<Get> {
     return this.getRequest('rent/getRentNum', {country,days,extension,pagination:false}).then((resp) => {
       return resp.item

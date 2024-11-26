@@ -1,4 +1,4 @@
-import _base from "./_base";
+import { default as _base } from './_base';
 export interface User {
     id: number;
     name: string;
@@ -92,7 +92,7 @@ export interface Pay {
         [key: string]: string | number | boolean;
     };
 }
-export default class GetUser extends _base {
+export declare class GetUser extends _base {
     balance(): Promise<{
         balance: number;
         zbalance: number;

@@ -1,9 +1,9 @@
-import GetNumbers from "./Apis/GetNumbers";
-import GetRent from "./Apis/GetRent";
-import GetProxy from "./Apis/GetProxy";
-import GetUser from "./Apis/GetUser";
-import GetFree from "./Apis/GetFree";
-import GetForward from "./Apis/GetForward";
+import { GetNumbers } from "./Apis/GetNumbers";
+import { GetRent } from "./Apis/GetRent";
+import { GetProxy } from "./Apis/GetProxy";
+import { GetUser } from "./Apis/GetUser";
+import { GetFree } from "./Apis/GetFree";
+import { GetOnlineProxy } from "./Apis/GetOnlineProxy";
 
 export default class OnlineSimDriver {
   private token: string|null;
@@ -29,6 +29,16 @@ export default class OnlineSimDriver {
     return this;
   }
 
+  setToken(token: string|null) {
+    this.token = token
+    return this;
+  }
+
+  setLang(lang: string) {
+    this.lang = lang
+    return this;
+  }
+
 
   numbers() {
     return (new GetNumbers(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
@@ -50,8 +60,8 @@ export default class OnlineSimDriver {
     return (new GetFree(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
   }
 
-  forward() {
-    return (new GetForward(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
+  onlineProxy() {
+    return (new GetOnlineProxy(this.token, this.lang, this.dev_id)).createRequest(this.token, 'https://onlineproxy.io/api/client/v1/')
   }
 }
 

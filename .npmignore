@@ -1,0 +1,25 @@
+# Source
+src/
+
+# Tests
+tests/
+
+# Config
+rollup.config.js
+tsconfig.json
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Logs
+logs/
+docs/
+tmp/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

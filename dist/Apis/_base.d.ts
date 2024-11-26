@@ -10,10 +10,10 @@ export default class _base {
     private lang;
     constructor(apiToken: string | null, lang: string, dev_id: number | null);
     createRequest(token: string | null, base?: string): this;
-    protected getRequest(url: string, params?: {
+    getRequest(url: string, params?: {
         [key: string]: any;
     }, suf?: boolean): Promise<any>;
-    protected postRequest(url: string, params?: {
+    postRequest(url: string, params?: {
         [key: string]: any;
     }): Promise<any>;
 }

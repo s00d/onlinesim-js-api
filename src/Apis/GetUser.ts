@@ -90,7 +90,7 @@ export interface Pay {
   },
 }
 
-export default class GetUser extends _base {
+export class GetUser extends _base {
   balance(): Promise<{ balance: number, zbalance: number, income: number }> {
     return this.getRequest('getBalance', {income: true}).then((res) => {
       return {

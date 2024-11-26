@@ -1,4 +1,4 @@
-import _base from "./_base";
+import { default as _base } from './_base';
 export interface StateOne {
     tzid: number;
     response: string;
@@ -29,7 +29,7 @@ export interface TariffCountryOne {
 interface callbackType {
     (code: string | null): void;
 }
-export default class GetNumbers extends _base {
+export declare class GetNumbers extends _base {
     price(service: string, country?: number): Promise<string>;
     get(service: string, country?: number, reject?: Array<number>, extension?: boolean): Promise<number>;
     getWithNumber(service: string, country?: number, reject?: Array<number>, extension?: boolean): Promise<{

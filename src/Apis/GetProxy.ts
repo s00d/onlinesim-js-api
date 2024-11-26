@@ -55,7 +55,7 @@ export interface Tariff {
 
 
 
-export default class GetProxy extends _base {
+export class GetProxy extends _base {
   tariffs(): Promise<Tariff> {
     return this.getRequest('proxy/tariffs', {}).then((resp) => {
       return resp

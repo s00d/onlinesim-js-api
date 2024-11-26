@@ -1,4 +1,4 @@
-import _base from "./_base";
+import { default as _base } from './_base';
 export interface Get {
     type: string;
     connect_type: string;
@@ -59,7 +59,7 @@ export interface Tariff {
         };
     };
 }
-export default class GetProxy extends _base {
+export declare class GetProxy extends _base {
     tariffs(): Promise<Tariff>;
     get(cl?: 'days' | 'traffic', type?: 'shared' | 'sharednowait' | 'private' | 'privatenowait' | 'multiport', connect?: 'https' | 'socks', count?: number, operator?: 'mts' | 'megafon' | 'beeline' | 'tele2' | null, country?: string, city?: string, port_count?: number, session?: boolean): Promise<Get>;
     state(orderby?: 'ASC' | 'DESC'): Promise<Array<Get>>;

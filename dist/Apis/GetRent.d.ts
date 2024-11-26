@@ -1,4 +1,4 @@
-import _base from "./_base";
+import { default as _base } from './_base';
 export interface Get {
     tzid: number;
     status: number;
@@ -37,7 +37,7 @@ export interface Tariff {
     };
     extend: number;
 }
-export default class GetRent extends _base {
+export declare class GetRent extends _base {
     get(country?: number, days?: number, extension?: boolean): Promise<Get>;
     state(): Promise<Array<Get>>;
     stateOne(tzid: number): Promise<Get>;

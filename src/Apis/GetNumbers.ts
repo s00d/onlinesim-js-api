@@ -33,7 +33,7 @@ function delay(timeout: number, result?: any ) {
   return new Promise(resolve => setTimeout(() => resolve(result), timeout));
 }
 
-export default class GetNumbers extends _base {
+export class GetNumbers extends _base {
   price(service: string, country = 7): Promise<string> {
     return this.getRequest('getPrice', {service, country}).then((resp) => {
       return resp.price

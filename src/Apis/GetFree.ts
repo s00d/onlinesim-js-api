@@ -3,6 +3,7 @@ import _base from "./_base";
 export interface GetCountriesOne {
   country: number,
   country_text: string,
+  country_original?: string,
 }
 
 export interface GetNumbersOne {
@@ -23,7 +24,32 @@ export interface GetMessagesOne {
   data_humans: string;
 }
 
-export default class GetFree extends _base {
+export interface GetNumbersListOne {
+  country: number,
+  country_original: string,
+  data_humans: string,
+  full_number: string,
+  is_archive: boolean
+}
+
+export interface GetFreeListResponse {
+  countries: Array<GetCountriesOne>;
+  numbers: {[key: string]: GetNumbersListOne};
+  messages: {
+    current_page: number
+    from: number
+    last_page: number
+    per_page: number
+    to: number
+    total: number
+    number: string
+    country: number
+    data: Array<GetMessagesOne>
+  };
+}
+
+
+export class GetFree extends _base {
   countries(): Promise<Array<GetCountriesOne>> {
     return this.getRequest('getFreeCountryList', {}).then((res) => {
       return res.countries
@@ -40,5 +66,11 @@ export default class GetFree extends _base {
     return this.getRequest('getFreeMessageList', {phone,page}).then((res) => {
       return res.messages.data
     })
+  }
+
+  freeList(): Promise<GetFreeListResponse> {
+    return this.getRequest('getFreeList', {}).then((res) => {
+      return res;
+    });
   }
 }

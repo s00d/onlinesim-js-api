@@ -7,6 +7,8 @@ export interface Resp {
   [key: number]: any
 }
 
+const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36';
+
 export default class _base {
   private token: string|null;
   private request: AxiosInstance;
@@ -19,14 +21,14 @@ export default class _base {
     this.request = axios.create({
       baseURL: 'https://onlinesim.host/api/',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36'
+        'User-Agent': userAgent
       }
     })
   }
 
   createRequest(token: string|null, base = 'https://onlinesim.host/api/') {
     const headers: {[key: string]: string} = {
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36'
+      'User-Agent': userAgent
     }
     if(token) {
       headers['Authorization'] = 'Bearer ' +  token
@@ -39,7 +41,7 @@ export default class _base {
     return this;
   }
 
-  protected getRequest(url: string, params: {[key: string]: any } = {}, suf = true) {
+  getRequest(url: string, params: {[key: string]: any } = {}, suf = true) {
     if(this.token) {
       params.apikey = this.token
     }
@@ -63,7 +65,7 @@ export default class _base {
     })
   }
 
-  protected postRequest(url: string,  params: {[key: string]: any } = {}) {
+  postRequest(url: string,  params: {[key: string]: any } = {}) {
     params.apikey = this.token;
     params.lang = this.lang;
     if(this.dev_id) {
