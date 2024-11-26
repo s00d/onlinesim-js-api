@@ -42,7 +42,7 @@ driver.getProxyList().then((result) => {
 
 - **Type**: `() => Promise<RotateResult>`
 - **Description**: Rotates the IP address of the proxy.
-- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/rotate)] [[de](https://onlineproxy.io/de/documentation/api/get/rotate]] [[en](https://onlineproxy.io/documentation/api/get/rotate)].
+- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/rotate)] [[de](https://onlineproxy.io/de/documentation/api/get/rotate)] [[en](https://onlineproxy.io/documentation/api/get/rotate)].
 - **Example**:
 
 ```typescript
@@ -58,7 +58,7 @@ driver.rotateProxy().then((result) => {
 
 - **Type**: `(id: string, comment: string) => Promise<CommentResult>`
 - **Description**: Creates or updates the comment for a specific proxy.
-- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/post/proxies_id__comment)] [[de](https://onlineproxy.io/de/documentation/api/post/proxies_id__comment]] [[en](https://onlineproxy.io/documentation/api/post/proxies_id__comment)].
+- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/post/proxies_id__comment)] [[de](https://onlineproxy.io/de/documentation/api/post/proxies_id__comment)] [[en](https://onlineproxy.io/documentation/api/post/proxies_id__comment)].
 - **Parameters**:
   - **id**: `string` — The ID of the proxy.
   - **comment**: `string` — The comment to create or update.
@@ -77,7 +77,7 @@ driver.createOrUpdateProxyComment('proxy_id', 'New comment').then((result) => {
 
 - **Type**: `() => Promise<AvailableProxies>`
 - **Description**: Retrieves the list of proxies available for order, matching the input filtering criteria.
-- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/filters)] [[de](https://onlineproxy.io/de/documentation/api/get/filters]] [[en](https://onlineproxy.io/documentation/api/get/filters)].
+- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/filters)] [[de](https://onlineproxy.io/de/documentation/api/get/filters)] [[en](https://onlineproxy.io/documentation/api/get/filters)].
 - **Example**:
 
 ```typescript
@@ -93,7 +93,7 @@ driver.getAvailableProxiesForOrder().then((result) => {
 
 - **Type**: `(orderData: any) => Promise<OrderResult>`
 - **Description**: Orders a proxy.
-- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/post/order)] [[de](https://onlineproxy.io/de/documentation/api/post/order]] [[en](https://onlineproxy.io/documentation/api/post/order)].
+- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/post/order)] [[de](https://onlineproxy.io/de/documentation/api/post/order)] [[en](https://onlineproxy.io/documentation/api/post/order)].
 - **Parameters**:
   - **orderData**: `any` — The data required to place an order.
 - **Example**:
@@ -111,7 +111,7 @@ driver.orderProxy(orderData).then((result) => {
 ## 📊 `getProxyTariffs`
 
 - **Type**: `() => Promise<Tariffs>`
-- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/tariffs)] [[de](https://onlineproxy.io/de/documentation/api/get/tariffs]] [[en](https://onlineproxy.io/documentation/api/get/tariffs)].
+- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/tariffs)] [[de](https://onlineproxy.io/de/documentation/api/get/tariffs)] [[en](https://onlineproxy.io/documentation/api/get/tariffs)].
 - **Description**: Retrieves the available periods and the minimum order price of proxies, matching the input filtering criteria.
 - **Example**:
 
@@ -128,7 +128,7 @@ driver.getProxyTariffs().then((result) => {
 
 - **Type**: `() => Promise<UserBalance>`
 - **Description**: Retrieves the user balance.
-- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/balance)] [[de](https://onlineproxy.io/documentation/api/get/balance]] [[en](https://onlineproxy.io/documentation/api/get/balance)].
+- **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/balance)] [[de](https://onlineproxy.io/documentation/api/get/balance)] [[en](https://onlineproxy.io/documentation/api/get/balance)].
 - **Example**:
 
 ```typescript
