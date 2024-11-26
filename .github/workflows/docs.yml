@@ -4,7 +4,6 @@ permissions:
   contents: write
 
 on:
-  # trigger deployment on every push to main branch
   push:
     branches: [main]
   # trigger deployment manually
