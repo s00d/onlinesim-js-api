@@ -60,7 +60,7 @@ class u {
     const r = {
       "User-Agent": d
     };
-    return e && (r.Authorization = "Bearer " + e), this.request = l.create({
+    return e && (r.Authorization = `Bearer ${e}`), this.request = l.create({
       baseURL: t,
       headers: r
     }), this;
@@ -76,7 +76,7 @@ class u {
     });
   }
   postRequest(e, t = {}) {
-    return t.apikey = this.token, t.lang = this.lang, this.dev_id && (t.dev_id = this.dev_id), this.request.post(e + ".php", t).then((r) => {
+    return t.apikey = this.token, t.lang = this.lang, this.dev_id && (t.dev_id = this.dev_id), this.request.post(`${e}.php`, t).then((r) => {
       const s = r.data;
       if ("response" in s && s.response.toString() !== "1")
         throw s.response.toString() === "NO_NUMBER" || s.response.toString() === "NO_NUMBER_FOR_FORWARD" ? new p(s.response.toString()) : new c(s.response.toString());
