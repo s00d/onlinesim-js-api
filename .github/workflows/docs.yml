@@ -5,7 +5,7 @@ permissions:
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   # trigger deployment manually
   workflow_dispatch:
 
