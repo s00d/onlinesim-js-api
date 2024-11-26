@@ -8,7 +8,7 @@ hero:
   actions:
   - theme: brand
     text: 🚀 Get Started
-    link: /guide/getting-started
+    link: /api/GetNumbers
   - theme: alt
     text: ⭐ View on GitHub
     link: https://github.com/s00d/onlinesim-js-api
