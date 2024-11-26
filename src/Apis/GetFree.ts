@@ -1,9 +1,9 @@
-import _base from "./_base";
+import _base from './_base';
 
 export interface GetCountriesOne {
-  country: number,
-  country_text: string,
-  country_original?: string,
+  country: number;
+  country_text: string;
+  country_original?: string;
 }
 
 export interface GetNumbersOne {
@@ -25,11 +25,11 @@ export interface GetMessagesOne {
 }
 
 export interface GetNumbersListOne {
-  country: number,
-  country_original: string,
-  data_humans: string,
-  full_number: string,
-  is_archive: boolean
+  country: number;
+  country_original: string;
+  data_humans: string;
+  full_number: string;
+  is_archive: boolean;
 }
 
 export interface GetFreeListResponse {
@@ -52,20 +52,20 @@ export interface GetFreeListResponse {
 export class GetFree extends _base {
   countries(): Promise<Array<GetCountriesOne>> {
     return this.getRequest('getFreeCountryList', {}).then((res) => {
-      return res.countries
-    })
+      return res.countries;
+    });
   }
 
   numbers(country: number): Promise<Array<GetNumbersOne>> {
     return this.getRequest('getFreePhoneList', {country}).then((res) => {
-      return res.numbers
-    })
+      return res.numbers;
+    });
   }
 
   messages(phone: number, page = 1): Promise<Array<GetMessagesOne>> {
     return this.getRequest('getFreeMessageList', {phone,page}).then((res) => {
-      return res.messages.data
-    })
+      return res.messages.data;
+    });
   }
 
   freeList(): Promise<GetFreeListResponse> {

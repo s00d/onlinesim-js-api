@@ -1,4 +1,4 @@
-import _base from "./_base";
+import _base from './_base';
 
 export interface Get {
   type: string;
@@ -40,7 +40,7 @@ export interface Tariff {
     }},
     operators: Array<string>,
     connect: Array<string>,
-  },
+  };
   traffic: {
     config: {
       [code: string]: {
@@ -50,7 +50,7 @@ export interface Tariff {
       },
     },
     price: {[tariff: string]: number}
-  }
+  };
 }
 
 
@@ -58,45 +58,45 @@ export interface Tariff {
 export class GetProxy extends _base {
   tariffs(): Promise<Tariff> {
     return this.getRequest('proxy/tariffs', {}).then((resp) => {
-      return resp
-    })
+      return resp;
+    });
   }
 
 
   get(cl:'days'|'traffic' = 'days', type:'shared'|'sharednowait'|'private'|'privatenowait'|'multiport' = 'private', connect:'https'|'socks' = 'https', count = 1, operator:'mts'|'megafon'|'beeline'|'tele2'|null = null, country:string = 'any', city = 'any', port_count = 1, session = true): Promise<Get> {
     return this.getRequest('proxy/getProxy', {class: cl, type,connect,count,operator,country,city,port_count,session}).then((resp) => {
-      return resp.item
-    })
+      return resp.item;
+    });
   }
 
   state(orderby:'ASC'|'DESC' = 'ASC'): Promise<Array<Get>> {
     return this.getRequest('proxy/getState', {orderby}).then((resp) => {
-      return resp.list
-    })
+      return resp.list;
+    });
   }
 
   stateOne(tzid:number): Promise<Get> {
     return this.getRequest('proxy/getState', {tzid}).then((resp) => {
-      return resp.list[0]
-    })
+      return resp.list[0];
+    });
   }
 
   changeIp(tzid:number): Promise<boolean> {
     return this.getRequest('proxy/changeIp', {tzid}).then((resp) => {
-      return true
-    })
+      return true;
+    });
   }
 
   changeType(tzid:number): Promise<string> {
     return this.getRequest('proxy/changeType', {tzid}).then((resp) => {
-      return resp.connect_type
-    })
+      return resp.connect_type;
+    });
   }
 
   setComment(tzid:number, comment:string = ''): Promise<boolean> {
     return this.getRequest('proxy/setComment', {tzid, comment}).then((resp) => {
-      return true
-    })
+      return true;
+    });
   }
 
 }

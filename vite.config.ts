@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import dts from "vite-plugin-dts";
+import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   plugins: [
@@ -13,6 +13,9 @@ export default defineConfig({
       entry: 'src/index.ts',
       formats: ['es', 'cjs'],
       fileName: (format) => `index.${format === 'es' ? 'mjs' : 'cjs'}`,
+    },
+    rollupOptions: {
+      external: ['axios'],
     },
   },
 });

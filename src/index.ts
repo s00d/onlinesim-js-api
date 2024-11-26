@@ -1,9 +1,9 @@
-import { GetNumbers } from "./Apis/GetNumbers";
-import { GetRent } from "./Apis/GetRent";
-import { GetProxy } from "./Apis/GetProxy";
-import { GetUser } from "./Apis/GetUser";
-import { GetFree } from "./Apis/GetFree";
-import { GetOnlineProxy } from "./Apis/GetOnlineProxy";
+import { GetNumbers } from './Apis/GetNumbers';
+import { GetRent } from './Apis/GetRent';
+import { GetProxy } from './Apis/GetProxy';
+import { GetUser } from './Apis/GetUser';
+import { GetFree } from './Apis/GetFree';
+import { GetOnlineProxy } from './Apis/GetOnlineProxy';
 
 export default class OnlineSimDriver {
   private token: string|null;
@@ -13,60 +13,60 @@ export default class OnlineSimDriver {
   private base: string = 'https://onlinesim.host/api/';
 
   constructor(apiToken: string|null = null, lang = 'en', dev_id: number|null = null) {
-    this.token = apiToken
-    this.dev_id = dev_id
-    this.lang = lang
+    this.token = apiToken;
+    this.dev_id = dev_id;
+    this.lang = lang;
   }
 
   setBase(base = 'https://onlinesim.host/api/') {
-    this.base = base
+    this.base = base;
     return this;
   }
 
 
   setOauth(token: string|null) {
-    this.oauth = token
+    this.oauth = token;
     return this;
   }
 
   setToken(token: string|null) {
-    this.token = token
+    this.token = token;
     return this;
   }
 
   setLang(lang: string) {
-    this.lang = lang
+    this.lang = lang;
     return this;
   }
 
 
   numbers() {
-    return (new GetNumbers(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
+    return (new GetNumbers(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base);
   }
 
   rent() {
-    return (new GetRent(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
+    return (new GetRent(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base);
   }
 
   proxy() {
-    return (new GetProxy(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
+    return (new GetProxy(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base);
   }
 
   user() {
-    return (new GetUser(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
+    return (new GetUser(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base);
   }
 
   free() {
-    return (new GetFree(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base)
+    return (new GetFree(this.token, this.lang, this.dev_id)).createRequest(this.oauth, this.base);
   }
 
   onlineProxy() {
-    return (new GetOnlineProxy(this.token, this.lang, this.dev_id)).createRequest(this.token, 'https://onlineproxy.io/api/client/v1/')
+    return (new GetOnlineProxy(this.token, this.lang, this.dev_id)).createRequest(this.token, 'https://onlineproxy.io/api/client/v1/');
   }
 }
 
-try {
+if (typeof window !== 'undefined') {
   // @ts-ignore
   window.OnlineSimDriver = OnlineSimDriver;
-} catch(err) {}
+}
 

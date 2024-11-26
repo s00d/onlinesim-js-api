@@ -1,5 +1,5 @@
-import {GetUser} from "../src/Apis/GetUser";
-import _base from "../src/Apis/_base";
+import {GetUser} from '../src/Apis/GetUser';
+import _base from '../src/Apis/_base';
 
 jest.mock('../src/Apis/_base');
 

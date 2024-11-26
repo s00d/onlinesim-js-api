@@ -1,4 +1,4 @@
-import _base from "./_base";
+import _base from './_base';
 
 export interface User {
   id: number;
@@ -23,8 +23,8 @@ export interface User {
 }
 
 export interface PayList {
-  forms: {[key: number]: string},
-  currency: {[key: string]: number},
+  forms: {[key: number]: string};
+  currency: {[key: string]: number};
   orders: {
     current_page: number,
     first_page_url: string,
@@ -47,7 +47,7 @@ export interface PayList {
         updated_at: string,
       }
     }
-  },
+  };
   paylist: {[key: string]: {
       list_id: number,
       enable: boolean,
@@ -74,11 +74,11 @@ export interface PayList {
         classes: string,
       }>
     }
-  }
+  };
 }
 
 export interface Pay {
-  payId: number,
+  payId: number;
   params: {
     url: string,
     label: string,
@@ -87,7 +87,7 @@ export interface Pay {
     newtab: boolean,
     noreferrer: boolean,
     [key: string]: string|number|boolean
-  },
+  };
 }
 
 export class GetUser extends _base {
@@ -97,25 +97,25 @@ export class GetUser extends _base {
         balance: res.balance,
         zbalance: res.zbalance,
         income: res.income,
-      }
-    })
+      };
+    });
   }
 
   profile(): Promise<User> {
     return this.getRequest('getProfile', {income: true}).then((res) => {
-      return res.profile
-    })
+      return res.profile;
+    });
   }
 
   getPaymentHistory(): Promise<PayList> {
     return this.getRequest('getPaymentHistory').then((res) => {
-      return res
-    })
+      return res;
+    });
   }
 
   createEmpty(params: {[key:string]: any}): Promise<Pay> {
     return this.getRequest('pay/createEmpty', params, false).then((res) => {
-      return res
-    })
+      return res;
+    });
   }
 }

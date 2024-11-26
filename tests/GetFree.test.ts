@@ -1,5 +1,5 @@
-import {GetFree} from "../src/Apis/GetFree";
-import _base from "../src/Apis/_base";
+import {GetFree} from '../src/Apis/GetFree';
+import _base from '../src/Apis/_base';
 
 jest.mock('../src/Apis/_base');
 

@@ -1,5 +1,5 @@
-import {GetProxy} from "../src/Apis/GetProxy";
-import _base from "../src/Apis/_base";
+import {GetProxy} from '../src/Apis/GetProxy';
+import _base from '../src/Apis/_base';
 
 jest.mock('../src/Apis/_base');
 

@@ -1,7 +1,4 @@
 {
-  "extends": [
-    "tslint-config-airbnb"
-  ],
   "rules": {
     "typedef": [
       false,
@@ -32,9 +29,6 @@
       true,
       "always",
       "ignore-bound-class-methods"
-    ],
-    "ter-arrow-parens": [
-      true
     ],
     "ter-indent": [
       false

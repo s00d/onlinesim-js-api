@@ -1,4 +1,4 @@
-import {GetOnlineProxy} from "../src/Apis/GetOnlineProxy";
+import {GetOnlineProxy} from '../src/Apis/GetOnlineProxy';
 import _base from '../src/Apis/_base';
 
 jest.mock('../src/Apis/_base');
@@ -17,7 +17,7 @@ describe('GetOnlineProxy', () => {
 
     const result = await getOnlineProxy.getProxy('1');
 
-    expect(mockGetRequest).toHaveBeenCalledWith('proxies/1');
+    expect(mockGetRequest).toHaveBeenCalledWith('proxies/1', {}, false);
     expect(result).toEqual({ id: '1', ip: '127.0.0.1', port: 8080 });
   });
 
@@ -27,7 +27,7 @@ describe('GetOnlineProxy', () => {
 
     const result = await getOnlineProxy.getProxyList();
 
-    expect(mockGetRequest).toHaveBeenCalledWith('proxies');
+    expect(mockGetRequest).toHaveBeenCalledWith('proxies', {}, false);
     expect(result).toEqual({ proxies: [{ id: '1', ip: '127.0.0.1', port: 8080 }] });
   });
 
@@ -37,7 +37,7 @@ describe('GetOnlineProxy', () => {
 
     const result = await getOnlineProxy.rotateProxy();
 
-    expect(mockGetRequest).toHaveBeenCalledWith('rotate');
+    expect(mockGetRequest).toHaveBeenCalledWith('rotate', {}, false);
     expect(result).toEqual({ success: true, newIp: '127.0.0.2' });
   });
 
@@ -57,7 +57,7 @@ describe('GetOnlineProxy', () => {
 
     const result = await getOnlineProxy.getAvailableProxiesForOrder();
 
-    expect(mockGetRequest).toHaveBeenCalledWith('filters');
+    expect(mockGetRequest).toHaveBeenCalledWith('filters', {}, false);
     expect(result).toEqual({ proxies: [{ id: '1', ip: '127.0.0.1', port: 8080 }] });
   });
 
@@ -78,7 +78,7 @@ describe('GetOnlineProxy', () => {
 
     const result = await getOnlineProxy.getProxyTariffs();
 
-    expect(mockGetRequest).toHaveBeenCalledWith('tariffs');
+    expect(mockGetRequest).toHaveBeenCalledWith('tariffs', {}, false);
     expect(result).toEqual({ tariffs: [{ period: '1 month', price: 10 }] });
   });
 
@@ -88,7 +88,7 @@ describe('GetOnlineProxy', () => {
 
     const result = await getOnlineProxy.getUserBalance();
 
-    expect(mockGetRequest).toHaveBeenCalledWith('balance');
+    expect(mockGetRequest).toHaveBeenCalledWith('balance', {}, false);
     expect(result).toEqual({ balance: 100 });
   });
 });

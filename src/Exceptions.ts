@@ -38,13 +38,13 @@ export class RequestException extends Error {
     NO_CONFIRM_FORWARD: 'unable to confirm forwarding',
     ERROR_NO_SERVICE_REPEAT: 'no services for repeated reception',
     SERVICE_TO_NUMBER_EMPTY: 'no numbers for repeated reception for this service',
-  }
+  };
 
   constructor (error?: string, text = null) {
-    super(error)
+    super(error);
     if(!text && error && error in RequestException.errors) {
       // @ts-ignore
-      throw new RequestException(error, RequestException.errors[error])
+      throw new RequestException(error, RequestException.errors[error]);
     }
 
     Error.captureStackTrace(this, RequestException);

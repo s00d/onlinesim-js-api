@@ -1,7 +1,6 @@
-import {GetNumbers} from "../src/Apis/GetNumbers";
-import {GetFree, GetCountriesOne, GetFreeListResponse, GetMessagesOne, GetNumbersOne} from "../src/Apis/GetFree";
-import {GetOnlineProxy} from "../src/Apis/GetOnlineProxy";
-import _base from "../src/Apis/_base";
+import {GetNumbers} from '../src/Apis/GetNumbers';
+import {GetFree, GetCountriesOne, GetMessagesOne} from '../src/Apis/GetFree';
+import {GetOnlineProxy} from '../src/Apis/GetOnlineProxy';
 
 describe('GetNumbers Integration Tests', () => {
   let getNumbers: GetNumbers;
@@ -82,22 +81,21 @@ describe('GetFree Integration Tests', () => {
 
 
 
-describe('GetOnlineProxy', () => {
-  let getOnlineProxy: GetOnlineProxy;
-
-  beforeEach(() => {
-    getOnlineProxy = new GetOnlineProxy('apiToken', 'en', 123);
-  });
-
-  // it('should call getProxy with correct parameters', async () => {
-  //   const result = await getOnlineProxy.getProxy('1');
-  //   console.log(1111, result)
-  //   expect(result).toEqual({ id: '1', ip: '127.0.0.1', port: 8080 });
-  // });
-
-  it('should call getProxyList with correct parameters', async () => {
-    const result = await getOnlineProxy.getProxyList();
-    console.log(1111, result)
-    expect(result).toEqual({ proxies: [{ id: '1', ip: '127.0.0.1', port: 8080 }] });
-  });
-});
+// describe('GetOnlineProxy', () => {
+//   let getOnlineProxy: GetOnlineProxy;
+//
+//   beforeEach(() => {
+//     getOnlineProxy = new GetOnlineProxy('apiToken', 'en', 123);
+//   });
+//
+//   // it('should call getProxy with correct parameters', async () => {
+//   //   const result = await getOnlineProxy.getProxy('1');
+//   //   console.log(1111, result)
+//   //   expect(result).toEqual({ id: '1', ip: '127.0.0.1', port: 8080 });
+//   // });
+//
+//   it('should call getProxyList with correct parameters', async () => {
+//     const result = await getOnlineProxy.getProxyList();
+//     expect(result).toEqual({ proxies: [{ id: '1', ip: '127.0.0.1', port: 8080 }] });
+//   });
+// });

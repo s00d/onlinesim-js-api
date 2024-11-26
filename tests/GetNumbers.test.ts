@@ -1,5 +1,5 @@
-import {GetNumbers} from "../src/Apis/GetNumbers";
-import _base from "../src/Apis/_base";
+import {GetNumbers} from '../src/Apis/GetNumbers';
+import _base from '../src/Apis/_base';
 
 jest.mock('../src/Apis/_base');
 

@@ -1,21 +1,21 @@
-import _base from "./_base";
+import _base from './_base';
 
 export interface Proxy {
-  id: number,
-  login: string,
-  password: string,
-  protocol: string,
-  host: string,
-  port: number,
-  geo_country: string,
-  geo_city: string,
-  geo_operator: string,
-  private: boolean,
-  comment: null|string,
-  rotate_ip_url: string,
-  rotate_ip_freq: number,
-  start_at: string,
-  stop_at: string
+  id: number;
+  login: string;
+  password: string;
+  protocol: string;
+  host: string;
+  port: number;
+  geo_country: string;
+  geo_city: string;
+  geo_operator: string;
+  private: boolean;
+  comment: null|string;
+  rotate_ip_url: string;
+  rotate_ip_freq: number;
+  start_at: string;
+  stop_at: string;
 
 }
 

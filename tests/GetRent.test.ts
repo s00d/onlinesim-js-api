@@ -1,5 +1,5 @@
-import {GetRent} from "../src/Apis/GetRent";
-import _base from "../src/Apis/_base";
+import {GetRent} from '../src/Apis/GetRent';
+import _base from '../src/Apis/_base';
 
 jest.mock('../src/Apis/_base');
 
