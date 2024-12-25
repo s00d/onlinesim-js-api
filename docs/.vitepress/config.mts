@@ -22,7 +22,6 @@ export default defineConfig({
         items: [
           { text: 'GetFree', link: '/api/GetFree' },
           { text: 'GetNumbers', link: '/api/GetNumbers' },
-          { text: 'GetOnlineProxy', link: '/api/GetOnlineProxy' },
           { text: 'GetProxy', link: '/api/GetProxy' },
           { text: 'GetRent', link: '/api/GetRent' },
           { text: 'GetUser', link: '/api/GetUser' },
