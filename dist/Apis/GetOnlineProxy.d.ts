@@ -47,7 +47,7 @@ export interface UserBalance {
 export declare class GetOnlineProxy extends _base {
     getProxy(id: string): Promise<Proxy>;
     getProxyList(): Promise<ProxyList>;
-    rotateProxy(): Promise<RotateResult>;
+    rotateProxy(token: string): Promise<RotateResult>;
     createOrUpdateProxyComment(id: string, comment: string): Promise<CommentResult>;
     getAvailableProxiesForOrder(): Promise<AvailableProxies>;
     orderProxy(orderData: any): Promise<OrderResult>;

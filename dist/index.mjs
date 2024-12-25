@@ -247,8 +247,8 @@ class y extends u {
    * Rotate proxy IP-address.
    * @returns A promise that resolves to the result of the IP rotation.
    */
-  rotateProxy() {
-    return this.getRequest("rotate", {}, !1);
+  rotateProxy(e) {
+    return this.getRequest("rotate", { token: e }, !1);
   }
   /**
    * Create/update proxy comment.

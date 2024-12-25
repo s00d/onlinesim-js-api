@@ -77,8 +77,8 @@ export class GetOnlineProxy extends _base {
    * Rotate proxy IP-address.
    * @returns A promise that resolves to the result of the IP rotation.
    */
-  rotateProxy(): Promise<RotateResult> {
-    return this.getRequest('rotate', {}, false);
+  rotateProxy(token: string): Promise<RotateResult> {
+    return this.getRequest('rotate', {token}, false);
   }
 
   /**

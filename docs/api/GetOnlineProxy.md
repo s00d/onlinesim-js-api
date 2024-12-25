@@ -40,7 +40,7 @@ driver.getProxyList().then((result) => {
 
 ## 🔄 `rotateProxy`
 
-- **Type**: `() => Promise<RotateResult>`
+- **Type**: `(token: string) => Promise<RotateResult>`
 - **Description**: Rotates the IP address of the proxy.
 - **docs**: [[ru](https://onlineproxy.io/ru/documentation/api/get/rotate)] [[de](https://onlineproxy.io/de/documentation/api/get/rotate)] [[en](https://onlineproxy.io/documentation/api/get/rotate)].
 - **Example**:
@@ -48,7 +48,7 @@ driver.getProxyList().then((result) => {
 ```typescript
 const driver = new OnlineProxyAPI('APIKEY', 'en', 123);
 
-driver.rotateProxy().then((result) => {
+driver.rotateProxy(token).then((result) => {
   console.log(result);
   // Output: { success: true, newIp: '127.0.0.2' }
 });
