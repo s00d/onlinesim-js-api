@@ -1,27 +1,17 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "declaration": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
-    "module": "commonjs",
-    "target": "es5",
-    "sourceMap": true,
-    "experimentalDecorators": true,
-    "removeComments": true,
-    "skipLibCheck": true
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts",
-    "tmp",
-    "tests",
-    "dist",
-    "docs"
-  ]
+  "include": ["src", "tests", "tsup.config.ts"]
 }
