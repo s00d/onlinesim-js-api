@@ -23,4 +23,22 @@ console.log(`enter ${number} in the app`)
 console.log('code:', await client.numbers.waitCode(tzid))
 ```
 
+## Testing
+
+`MockOnlineSim` is a built-in offline fake of the API: test your integration without network, key or money.
+More in the [testing guide](https://s00d.github.io/onlinesim-js-api/testing).
+
+```ts
+import assert from 'node:assert/strict'
+import { MockOnlineSim } from 'onlinesim-js-api'
+
+const mock = new MockOnlineSim({ balance: 10 })
+const client = mock.client()
+
+const tzid = await client.numbers.get('google', 44)
+mock.addSmsAfter(tzid, 'Your code: 123-456', 2) // arrives on the third poll
+assert.equal(await client.numbers.waitCode(tzid, { interval: 0 }), '123456')
+assert.equal(mock.balance(), 9.8)
+```
+
 Documentation: **https://s00d.github.io/onlinesim-js-api/** · Changes: [CHANGELOG.md](CHANGELOG.md) · License: Apache-2.0
