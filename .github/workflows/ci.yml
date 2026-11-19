@@ -24,9 +24,13 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run smoke
+      # Package linters on the built artifact: publint (exports, files) and attw (ESM, CJS and types resolve).
+      - run: npm run lint:package
+      # Pack, check the tarball contents, install it into an empty project, run the README "Testing" example.
+      - run: npm run smoke:artifact
 
   # The dev toolchain (vitest, tsup) needs Node 22+, the package supports Node 18:
-  # build on 22, then run the built ESM and CJS bundles on 18.
+  # build on 22, then run the built ESM and CJS bundles and the packed artifact on 18.
   node18:
     name: smoke (node 18)
     runs-on: ubuntu-latest
@@ -42,3 +46,4 @@ jobs:
         with:
           node-version: 18
       - run: node --version && node tests/smoke-dist.mjs
+      - run: node tests/smoke-artifact.mjs

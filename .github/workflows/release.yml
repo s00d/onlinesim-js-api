@@ -1,0 +1,63 @@
+name: release
+
+# Push a version tag (X.Y.Z, no `v`) to publish to npm and create the GitHub release.
+# npm trusted publishing (OIDC): no NPM_TOKEN. The registry pins this file name and the `release` environment.
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing needs npm >= 11.5.
+      - run: npm install -g npm@^11.5.1 && npm --version
+
+      - name: Tag matches package.json version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "$TAG" != "$version" ]; then
+            echo "::error::tag $TAG does not match package.json version $version"
+            exit 1
+          fi
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run lint:package
+      - run: npm run smoke
+      - run: npm run smoke:artifact
+
+      - run: npm publish --provenance --access public
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "release $TAG exists, skipping"
+            exit 0
+          fi
+          awk -v tag="$TAG" '$0 == "## " tag { found = 1; next } found && /^## / { exit } found { print }' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::no '## $TAG' section in CHANGELOG.md"
+            exit 1
+          fi
+          gh release create "$TAG" --title "$TAG" --latest --notes-file release-notes.md

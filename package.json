@@ -1,6 +1,6 @@
 {
   "name": "onlinesim-js-api",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Typed, zero-dependency client for the OnlineSim API (SMS numbers, rent, account, free numbers)",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,10 +16,12 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "CHANGELOG.md"
   ],
   "sideEffects": false,
   "engines": {
@@ -32,9 +34,11 @@
     "test:watch": "vitest --dir tests",
     "test:integration": "vitest run tests/integration.test.ts",
     "smoke": "node tests/smoke-dist.mjs",
-    "prepublishOnly": "npm run typecheck && npm test && npm run build",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build && npm run lint:package",
     "docs:dev": "npm --prefix docs run dev",
-    "docs:build": "npm --prefix docs run build"
+    "docs:build": "npm --prefix docs run build",
+    "lint:package": "publint --strict && attw --pack",
+    "smoke:artifact": "node tests/smoke-artifact.mjs"
   },
   "repository": {
     "type": "git",
@@ -55,7 +59,9 @@
   "author": "s00d",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@types/node": "^22.20.5",
+    "publint": "^0.3.25",
     "tsup": "^9.0.0",
     "typescript": "^6.0.3",
     "vitest": "^5.1.1"

@@ -16,5 +16,10 @@ for (const [name, mod] of [['esm', esm], ['cjs', cjs]]) {
   const client = new mod.OnlineSim({ apiKey: 'k', baseUrl: 'https://api.test/api/', fetch })
   assert.deepEqual(await client.user.balance(), { balance: 10.5, zbalance: 1 })
   assert.equal(mod.parseWebhook('{"operation_id":"5"}').operation_id, 5)
+  const mock = new mod.MockOnlineSim()
+  const mocked = mock.client()
+  const tzid = await mocked.numbers.get('google', 44)
+  mock.addSmsAfter(tzid, 'code 12-34', 1)
+  assert.equal(await mocked.numbers.waitCode(tzid, { interval: 0 }), '1234')
   console.log(`${name}: ok`)
 }

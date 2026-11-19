@@ -10,5 +10,7 @@ export { waitCode } from './wait'
 export { parseWebhook } from './webhook'
 export { ApiError, ERROR_MESSAGES, NoNumberError, OnlineSimError, TimeoutError, TransportError } from './errors'
 export type * from './types'
+export { MockOnlineSim } from './mock'
+export type { MockOperation, MockOptions, MockPrices, MockRent, MockRentTariff, MockRequest, MockSms } from './mock'
 
 export default OnlineSim

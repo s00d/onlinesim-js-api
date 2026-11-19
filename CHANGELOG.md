@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0
+
+### Added
+
+- `MockOnlineSim`: a built-in, in-process fake of the OnlineSim API for testing integrations offline — no network, key, money or clock. `mock.client()` returns a normal `OnlineSim` wired to it (`mock.transport` is the fake `fetch`). It answers every endpoint the SDK calls like the real backend (HTTP 456 for a wrong key, string/int `response`, decimal-string money, `[]` for empty maps) and keeps balance, operations and rents. Test helpers: `addSms`, `addSmsAfter` (lets `waitCode` run with `interval: 0`), `failNext`, `failNextTransport`, `setBalance`, `balance`, `operations`, `rents`, `requests`, `reset`. Exported from the main entry; tree-shaken away when unused. See the [testing guide](https://s00d.github.io/onlinesim-js-api/testing).
+- `"./package.json"` in `exports`; `CHANGELOG.md` in the package.
+- Packaging checks in CI: `publint --strict`, `attw --pack` (ESM, CJS and types), and a smoke test that installs the packed tarball into an empty project and runs the README "Testing" example on Node 18 and 22.
+
 ## 2.0.0
 
 A rewrite. The public API changed; see the [docs](https://s00d.github.io/onlinesim-js-api/).
