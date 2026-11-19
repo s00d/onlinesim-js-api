@@ -1,4 +1,14 @@
-/vendor/
-/.env
 /node_modules
-/runner
+/dist
+/coverage
+.env
+.DS_Store
+*.log
+
+# docs site (standalone package in docs/)
+/docs/node_modules
+/docs/.nuxt
+/docs/.output
+/docs/.data
+/docs/dist
+/docs/.vitepress/cache
