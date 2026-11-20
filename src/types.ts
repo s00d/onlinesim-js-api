@@ -38,7 +38,8 @@ export interface OperationSms {
 /** Number operation (getState item). */
 export interface Operation {
   tzid: number
-  response: OperationStatus
+  /** Absent when no number could be issued. */
+  response?: OperationStatus
   number?: string
   service?: string
   country?: number
@@ -131,9 +132,11 @@ export interface WaitCodeOptions {
 
 export interface RentSms {
   id: number
+  /** Sender. `notify`: a notice about a prohibited sender (does not confirm the rent); `init`: record of a rent confirmed at once. */
   service: string
   text: string
-  code: string
+  /** Code found in the text, `''` when none; the number `0` for a `notify` SMS. */
+  code: string | number
   created_at: string
 }
 
@@ -143,7 +146,7 @@ export interface RentItem {
   status: number
   number: string
   country: number
-  /** Price paid, USD (parsed from the server's decimal string). */
+  /** Cost of the rent incl. extensions, USD (the server sends a number or a decimal string). Reserved while `status` is 0, charged once confirmed. */
   sum: number
   days: number
   hours: number
@@ -190,9 +193,9 @@ export interface RentTariff {
 // ----- user -----
 
 export interface Balance {
-  /** Total balance, USD. Includes `zbalance`: available = balance − zbalance. */
+  /** Total balance, USD. Includes `zbalance`: available = balance − max(zbalance, 0). */
   balance: number
-  /** Sum frozen by numbers in progress. */
+  /** Sum frozen by numbers and rents in progress; may be negative. */
   zbalance: number
   /** Partner income. */
   income?: number
@@ -213,8 +216,8 @@ export interface Profile {
   number_country?: number | null
   number_reject?: string[] | Record<string, string> | null
   webhook_url?: string | null
-  number?: string | null
-  country?: number | null
+  number?: number | null
+  country?: string | null
   number_region?: number | null
   is_api?: boolean
   active?: string
@@ -251,9 +254,9 @@ export interface PaymentOrder {
   id: number
   /** Decimal string, e.g. `"89.00"`. */
   sum: string
-  currency: string
+  currency: string | null
   stat: number
-  form_text?: string
+  form_text?: string | null
   status_text?: string
   created_at: string
   [key: string]: unknown
@@ -261,8 +264,8 @@ export interface PaymentOrder {
 
 export interface PaymentHistory {
   orders: Paginator<PaymentOrder>
-  /** Payment methods by list id. */
-  paylist: Record<string, unknown>
+  /** Payment methods by group id; a list when the ids are 0, 1, 2… (the server sends a JSON array then). */
+  paylist: Record<string, unknown> | unknown[]
   domains?: string[]
   forms?: Record<string, string>
   currency?: Record<string, number>
@@ -302,13 +305,13 @@ export interface WebhookLog {
 
 export interface FreeCountry {
   country: number
-  country_text: string
-  country_original: string
+  country_text: string | null
+  country_original: string | null
 }
 
 export interface FreeNumber {
   country: number
-  country_original: string
+  country_original: string | null
   full_number: string
   data_humans: string
   is_archive: boolean

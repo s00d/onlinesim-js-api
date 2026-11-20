@@ -20,6 +20,24 @@ describe('rent', () => {
     expect(rent.messages[0]?.code).toBe('195895')
   })
 
+  it('decodes the spec shapes: sum as a number (getRentNum) or a string (getRentState), code 0 for a notify SMS', async () => {
+    const item = {
+      ...state().list[0],
+      status: 0,
+      checked: false,
+      sum: 1.5,
+      messages: [
+        { id: 2, service: 'notify', text: 'Messages from this sender are not accepted', code: 0, created_at: '2026-11-19 10:01:12' },
+        { id: 1, service: 'Google', text: 'G-070051', code: '070051', created_at: '2026-11-19 10:01:00' },
+      ],
+    }
+    const { client } = fakeClient([{ json: { response: 1, item } }, { json: { response: 1, list: [{ ...item, sum: '2.40' }] } }])
+    const rent = await client.rent.get(7, 3)
+    expect(rent).toMatchObject({ status: 0, checked: false, sum: 1.5 })
+    expect(rent.messages.map((m) => m.code)).toEqual([0, '070051'])
+    expect((await client.rent.stateOne(rent.tzid)).sum).toBe(2.4)
+  })
+
   it('get with extension=false sends extension=0', async () => {
     const { client, last } = fakeClient([{ json: { response: 1, item: state().list[1] } }])
     await client.rent.get(7, 1, false)

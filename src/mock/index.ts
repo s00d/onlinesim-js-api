@@ -108,9 +108,10 @@ export class MockOnlineSim {
 
     const handler = Object.hasOwn(ROUTES, req.path) ? ROUTES[req.path] : undefined
     if (!handler) return text(404, 'Not Found')
-    if (!PUBLIC_PATHS.includes(req.path) && authorization(init.headers) !== `Bearer ${state.apiKey}`) {
-      return json({ response: 'ERROR_WRONG_KEY' }, 456)
-    }
+    // A wrong key is HTTP 456 (public endpoints check a sent key too); no key at all is HTTP 200.
+    const auth = authorization(init.headers)
+    if (auth !== null && auth !== `Bearer ${state.apiKey}`) return json({ response: 'ERROR_WRONG_KEY' }, 456)
+    if (auth === null && !PUBLIC_PATHS.includes(req.path)) return json({ response: 'ERROR_WRONG_KEY' })
     return json(handler(state, req))
   }
 }

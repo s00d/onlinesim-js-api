@@ -14,20 +14,27 @@ async function rejects(promise: Promise<unknown>): Promise<unknown> {
 }
 
 describe('MockOnlineSim: auth and transport', () => {
-  it('wrong or missing key answers HTTP 456 ERROR_WRONG_KEY, which the client maps to ApiError', async () => {
+  it('a wrong key is HTTP 456 ERROR_WRONG_KEY, a missing key HTTP 200 ERROR_WRONG_KEY; both map to ApiError', async () => {
     const mock = new MockOnlineSim()
     for (const apiKey of ['nope', '']) {
       const error = await rejects(mock.client({ apiKey }).user.balance())
       expect(error).toBeInstanceOf(ApiError)
       expect(error).toMatchObject({ code: 'ERROR_WRONG_KEY' })
     }
+    const missing = await mock.transport('https://x.test/api/getBalance.php', {})
+    expect(missing.status).toBe(200)
+    expect(await missing.json()).toEqual({ response: 'ERROR_WRONG_KEY' })
+    const wrong = await mock.transport('https://x.test/api/getBalance.php', { headers: { Authorization: 'Bearer nope' } })
+    expect(wrong.status).toBe(456)
   })
 
-  it('tariffs and free numbers need no key', async () => {
-    const client = new MockOnlineSim().client({ apiKey: '' })
+  it('tariffs and free numbers need no key, but a sent wrong key is still HTTP 456', async () => {
+    const mock = new MockOnlineSim()
+    const client = mock.client({ apiKey: '' })
     await expect(client.numbers.tariffsOne(44)).resolves.toMatchObject({ code: 44 })
     await expect(client.rent.tariffsOne(7)).resolves.toMatchObject({ code: 7 })
     await expect(client.free.list()).resolves.toMatchObject({ messages: { country: 44 } })
+    await expect(mock.client({ apiKey: 'nope' }).free.list()).rejects.toMatchObject({ code: 'ERROR_WRONG_KEY' })
   })
 
   it('works as the transport of a client built by hand, with any base URL', async () => {
@@ -62,6 +69,9 @@ describe('MockOnlineSim: numbers', () => {
       country: 7,
       time: 1200,
       service: 'vkcom',
+      title: 'vkcom',
+      response_text: 'Waiting for SMS',
+      guard_interval_remaining_seconds: 0,
     })
     expect(mock.requests.map((r) => r.query.number)).toEqual([undefined, '1'])
     await expect(client.user.balance()).resolves.toEqual({ balance: 100, zbalance: 0.7, income: 0 })
@@ -121,7 +131,18 @@ describe('MockOnlineSim: numbers', () => {
       { service: 'telegram', msg: 'Welcome!' },
       { service: 'telegram', msg: '98765' },
     ])
-    await expect(client.numbers.next(424242)).resolves.toBe(true) // always succeeds, like the backend
+    expect(mock.requests.filter((r) => r.path === 'setOperationRevise.php')).toHaveLength(1)
+  })
+
+  it('next: {"tzid":"N","response":"1"}; ERROR_WRONG_TZID for an unknown tzid, ERROR_NO_TZID for 0', async () => {
+    const mock = new MockOnlineSim()
+    const client = mock.client()
+    const tzid = await client.numbers.get('google', 44)
+    const res = await mock.transport(`https://x.test/api/setOperationRevise.php?tzid=${tzid}`, { headers: { Authorization: 'Bearer mock-key' } })
+    expect(await res.json()).toEqual({ tzid: String(tzid), response: '1' })
+    await expect(client.numbers.next(424242)).rejects.toMatchObject({ code: 'ERROR_WRONG_TZID' })
+    await expect(client.numbers.next(0)).rejects.toMatchObject({ code: 'ERROR_NO_TZID' })
+    await expect(client.numbers.close(0)).rejects.toMatchObject({ code: 'ERROR_NO_TZID' })
   })
 
   it('close after an SMS spends the price, without one refunds it; ban after an SMS answers "0"', async () => {
@@ -186,39 +207,74 @@ describe('MockOnlineSim: numbers', () => {
 })
 
 describe('MockOnlineSim: rent', () => {
-  it('get charges, state lists, extend, close; extend refused for non-extendable rents', async () => {
+  it('get reserves, the first SMS confirms and charges; extend charges at once; close', async () => {
     const mock = new MockOnlineSim({ balance: 10 })
     const client = mock.client()
     const rent = await client.rent.get(7, 3)
-    expect(rent).toMatchObject({ tzid: 1, number: '900000001', sum: 2.5, days: 3, time: 3 * 1440, time_seconds: 3 * 86400, extension: 1, messages: [] })
+    expect(rent).toMatchObject({ tzid: 1, number: '900000001', status: 0, checked: false, sum: 2.5, days: 0, time: 20, time_seconds: 1200 })
+    expect(rent).toMatchObject({ rent: 3, days_autoextend: 3, extension: 1, guard_interval_remaining_seconds: 0, messages: [] })
     expect(rent.extend).toEqual({ 1: 1, 3: 2.5, 7: 5 })
-    expect(mock.balance()).toBe(7.5)
+    // reserved: the total balance stays, the price is frozen
+    expect(mock.balance()).toBe(10)
+    await expect(client.user.balance()).resolves.toMatchObject({ balance: 10, zbalance: 2.5 })
+    await expect(client.rent.extend(rent.tzid)).rejects.toMatchObject({ code: 'TRY_AGAIN_LATER' }) // not confirmed yet
 
     mock.addSms(rent.tzid, 'Bank: 777 888', { service: 'bank' })
     mock.addSms(rent.tzid, 'no code here')
     const state = await client.rent.stateOne(rent.tzid)
+    expect(state).toMatchObject({ status: 1, checked: true, days: 3, time: 3 * 1440, time_seconds: 3 * 86400 })
     expect(state.messages.map((m) => [m.service, m.code])).toEqual([
       ['other', ''],
       ['bank', '777888'],
     ]) // newest first
+    expect(mock.balance()).toBe(7.5)
+    await expect(client.user.balance()).resolves.toMatchObject({ balance: 7.5, zbalance: 0 })
 
-    expect(await client.rent.extend(rent.tzid, 1)).toMatchObject({ days: 4, sum: 3.5 })
+    expect(await client.rent.extend(rent.tzid, 1)).toMatchObject({ days: 4, rent: 4, days_autoextend: 3, sum: 3.5 })
     expect(mock.balance()).toBe(6.5)
+    await expect(client.rent.extend(rent.tzid, 2)).rejects.toMatchObject({ code: 'TRY_AGAIN_LATER' }) // unknown period
+    await expect(client.rent.extend(999)).rejects.toMatchObject({ code: 'TRY_AGAIN_LATER' }) // unknown tzid
 
     const fixed = await client.rent.get(7, 1, false)
-    expect(fixed).toMatchObject({ extension: 0, extend: {} })
+    mock.addSms(fixed.tzid, '1234')
+    expect(await client.rent.stateOne(fixed.tzid)).toMatchObject({ extension: 0, extend: {} })
     await expect(client.rent.extend(fixed.tzid)).rejects.toMatchObject({ code: 'TRY_AGAIN_LATER' })
     expect((await client.rent.state()).map((r) => r.tzid)).toEqual([rent.tzid, fixed.tzid])
 
-    await client.rent.close(fixed.tzid)
+    await client.rent.close(fixed.tzid) // confirmed: no refund
+    expect(mock.balance()).toBe(5.5)
     expect(mock.rents().map((r) => r.tzid)).toEqual([rent.tzid])
     await expect(client.rent.stateOne(fixed.tzid)).rejects.toMatchObject({ code: 'ERROR_NO_OPERATIONS' })
-    await expect(client.rent.close(fixed.tzid)).rejects.toMatchObject({ code: 'ERROR_WRONG_TZID' })
+    await expect(client.rent.close(fixed.tzid)).rejects.toMatchObject({ code: 'ERROR_NO_OPERATIONS' })
+  })
+
+  it('sum is a number in getRentNum/extendRentState and a decimal string in getRentState on the wire', async () => {
+    const mock = new MockOnlineSim()
+    const auth = { headers: { Authorization: 'Bearer mock-key' } }
+    const got = await (await mock.transport('https://x.test/api/rent/getRentNum.php?days=3', auth)).json()
+    expect(got.item.sum).toBe(2.5)
+    const listed = await (await mock.transport('https://x.test/api/rent/getRentState.php', auth)).json()
+    expect(listed.list[0].sum).toBe('2.50')
+  })
+
+  it('an unconfirmed rent: close releases the reservation; notify SMS has code 0 and confirms nothing; guardInterval', async () => {
+    const mock = new MockOnlineSim({ balance: 10, guardInterval: 120 })
+    const client = mock.client()
+    const rent = await client.rent.get(7, 3)
+    expect(rent.guard_interval_remaining_seconds).toBe(120)
+    await expect(client.rent.close(rent.tzid)).rejects.toMatchObject({ code: 'NO_COMPLETE_TZID' })
+    mock.addSms(rent.tzid, 'Messages from this sender are not accepted', { service: 'notify' })
+    const state = await client.rent.stateOne(rent.tzid)
+    expect(state).toMatchObject({ status: 0, checked: false, guard_interval_remaining_seconds: 0 })
+    expect(state.messages[0]).toMatchObject({ service: 'notify', code: 0 })
+    await expect(client.rent.close(rent.tzid)).resolves.toBe(true)
+    expect(mock.balance()).toBe(10) // released, nothing charged
+    await expect(client.user.balance()).resolves.toMatchObject({ balance: 10, zbalance: 0 })
   })
 
   it('rent errors: unknown country, unknown days, low balance', async () => {
     const client = new MockOnlineSim({ balance: 1.5 }).client()
-    await expect(client.rent.get(44)).rejects.toMatchObject({ code: 'NO_COUNTRY' })
+    await expect(client.rent.get(44)).rejects.toMatchObject({ code: 'UNDEFINED_COUNTRY' })
     await expect(client.rent.get(7, 2)).rejects.toMatchObject({ code: 'UNDEFINED_DAYS' })
     await expect(client.rent.get(7, 3)).rejects.toMatchObject({ code: 'WARNING_LOW_BALANCE' })
   })
@@ -229,7 +285,7 @@ describe('MockOnlineSim: rent', () => {
     const { tzid } = await client.rent.get()
     mock.addSmsAfter(tzid, '6060', 1)
     expect((await client.rent.stateOne(tzid)).messages).toEqual([])
-    expect((await client.rent.state())[0]?.messages[0]).toMatchObject({ code: '6060', service: 'other' })
+    expect((await client.rent.state())[0]).toMatchObject({ status: 1, messages: [{ code: '6060', service: 'other' }] })
     expect(await client.rent.tariffs()).toEqual({
       7: { code: 7, enabled: true, name: 'russia', new: false, position: 7, count: { 1: 100, 3: 100, 7: 100 }, days: { 1: 1, 3: 2.5, 7: 5 }, extend: 1, confirm: false, ext_counts: { 1: 100, 3: 100, 7: 100 } },
     })
@@ -242,7 +298,8 @@ describe('MockOnlineSim: user and free', () => {
     const mock = new MockOnlineSim({ apiKey: 'secret' })
     const client = mock.client()
     expect(await client.user.profile()).toMatchObject({ id: 1, apikey: 'secret', webhook_url: null })
-    await expect(client.user.setWebhookUrl('ftp://x')).rejects.toMatchObject({ code: 'VALIDATION_ERROR', message: 'The webhook url must be a valid URL.' })
+    await expect(client.user.setWebhookUrl('not a url')).rejects.toMatchObject({ code: 'VALIDATION_ERROR', message: 'The webhook url must be a valid URL.' })
+    await expect(client.user.setWebhookUrl('ftp://x')).resolves.toBe(true) // any scheme://… URL
     await client.user.setWebhookUrl('https://example.com/hook')
     expect(mock.requests.at(-1)).toMatchObject({ method: 'POST', path: 'profile.php', body: { profile: { webhook_url: 'https://example.com/hook' } } })
     expect((await client.user.profile()).webhook_url).toBe('https://example.com/hook')
@@ -251,12 +308,17 @@ describe('MockOnlineSim: user and free', () => {
     mock.addSms(tzid, 'code 1234')
     const rent = await client.rent.get()
     mock.addSms(rent.tzid, 'code 5678')
+    mock.addSms(rent.tzid, 'no code')
     const logs = await client.user.webhookLogs()
-    expect(logs).toMatchObject({ total: 2, current_page: 1, per_page: 10 })
+    expect(logs).toMatchObject({ total: 3, current_page: 1, per_page: 10 })
     expect(logs.data.map((l) => [l.type, l.params.operation_id, l.params.code])).toEqual([
+      ['rent_sms', rent.tzid, ''],
       ['rent_sms', rent.tzid, '5678'],
       ['receiving_sms', tzid, '1234'],
     ])
+    // activation: +number, seconds left, order time; rent: digits without +, minutes left, SMS time
+    expect(logs.data[2]?.params).toMatchObject({ number: '+44900000001', time_left: 1200, time_start: '2026-01-01 00:00:01' })
+    expect(logs.data[1]?.params).toMatchObject({ number: '7900000002', time_left: 1440, time_start: '2026-01-01 00:00:03' })
 
     await client.user.clearWebhookUrl()
     expect((await client.user.profile()).webhook_url).toBeNull()
@@ -268,16 +330,22 @@ describe('MockOnlineSim: user and free', () => {
     await client.numbers.get('telegram')
     await expect(client.user.balance()).resolves.toEqual({ balance: 3, zbalance: 1.2, income: 0 })
     const history = await client.user.paymentHistory()
-    expect(history).toMatchObject({ paylist: {}, orders: { data: [], total: 0, current_page: 1 } })
+    expect(history).toMatchObject({ paylist: [], forms: { 1: 'Card' }, buttons: { USD: [5, 10, 20] }, orders: { data: [], total: 0, current_page: 1 } })
   })
 
   it('free list: countries, numbers keyed by the short number, messages of the selected number', async () => {
     const client = new MockOnlineSim().client()
     const uk = await client.free.list()
-    expect(uk.countries.map((c) => c.country)).toEqual([7, 44])
+    expect(uk.countries.map((c) => c.country)).toEqual([44, 7])
     expect(Object.keys(uk.numbers)).toEqual(['7459608320'])
-    expect(uk.messages).toMatchObject({ number: '7459608320', country: 44, total: 2 })
-    expect(uk.messages.data[0]?.code).toBe('195895')
+    expect(uk.messages).toMatchObject({ number: '7459608320', country: 44, total: 2, per_page: 10 })
+    expect(uk.messages.data[0]).toMatchObject({ code: '195895', created_at: '2026-01-01T00:00:00.000000Z' })
+    expect((await client.free.list({ count: 0 })).messages.per_page).toBe(10) // clamped to 10..500
+    expect((await client.free.list({ count: 9999 })).messages.per_page).toBe(500)
+    expect((await client.free.list({ country: 999 })).messages.country).toBe(44) // unknown → the first country
+    const raw = await (await new MockOnlineSim().transport('https://x.test/api/getFreeList', {})).json()
+    expect(raw).toMatchObject({ response: 1, content: null })
+    expect(typeof raw.ignore).toBe('string')
     const ru = await client.free.list({ country: 7 })
     expect(ru.messages.data[0]).toMatchObject({ code: '51423', my_number: '9001234567' })
   })

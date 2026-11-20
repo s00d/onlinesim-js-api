@@ -9,7 +9,9 @@ import {
   fromMills,
   MOCK_USER_ID,
   MockState,
+  NOTIFY,
   OPERATION_TIME,
+  RENT_FIRST_SMS_MINUTES,
   stamp,
   toMills,
   type MockOperation,
@@ -37,6 +39,9 @@ function int(req: MockRequest, key: string, fallback: number): number {
   const n = Number(req.query[key])
   return req.query[key] === undefined || !Number.isInteger(n) ? fallback : n
 }
+
+/** `YYYY-MM-DDTHH:MM:SS.000000Z`, the ISO-8601 form getFreeList sends. */
+const iso = (seconds: number): string => `${stamp(seconds).replace(' ', 'T')}.000000Z`
 
 /** USD with 3 decimals, as the backend sends `balance`. */
 const decimal = (mills: number, digits = 3): string => fromMills(mills).toFixed(digits)
@@ -123,7 +128,17 @@ const getNum: Handler = (state, req) => {
   state.frozen += cost
   state.operations.set(tzid, { tzid, service, country, number, sum: price, status: 'TZ_NUM_WAIT', messages: [], cursor: 0 })
   if (req.query.number === undefined) return { response: 1, tzid }
-  return { response: 1, tzid, number, country, time: OPERATION_TIME, service }
+  return {
+    response: 1,
+    tzid,
+    number,
+    country,
+    time: OPERATION_TIME,
+    service,
+    title: service,
+    response_text: 'Waiting for SMS',
+    guard_interval_remaining_seconds: state.guardInterval,
+  }
 }
 
 const getState: Handler = (state, req) => {
@@ -137,17 +152,19 @@ const getState: Handler = (state, req) => {
 
 const setOperationRevise: Handler = (state, req) => {
   const tzid = int(req, 'tzid', 0)
+  if (!tzid) return error('ERROR_NO_TZID')
   const op = state.operations.get(tzid)
-  // Always succeeds, even for unknown tzids, like the backend.
-  if (op && op.status !== 'TZ_OVER_OK') {
+  if (!op) return error('ERROR_WRONG_TZID')
+  if (op.status !== 'TZ_OVER_OK') {
     op.cursor = op.messages.length
     op.status = 'TZ_NUM_WAIT'
   }
-  return { response: 1, tzid }
+  return { tzid: String(tzid), response: '1' }
 }
 
 const setOperationOk: Handler = (state, req) => {
   const tzid = int(req, 'tzid', 0)
+  if (!tzid) return error('ERROR_NO_TZID')
   const op = state.operations.get(tzid)
   if (!op || op.status === 'TZ_OVER_OK') return error('ERROR_WRONG_TZID')
   const received = op.messages.length > 0
@@ -190,59 +207,72 @@ const getNumbersStats: Handler = (state, req) => {
 
 // ----- rent -----
 
-function rentItem(state: MockState, rent: MockRent, req: MockRequest) {
+/**
+ * A rent as the backend sends it. `sum` is a number in getRentNum/extendRentState and a 2-decimal string in
+ * getRentState (`stringSum`). An unconfirmed rent (`status` 0) waits 20 minutes for its first SMS.
+ */
+function rentItem(state: MockState, rent: MockRent, req: MockRequest, stringSum = false) {
   const tariff = state.rentTariffs[rent.country]
   const extendable = rent.extension && tariff?.extend === 1
+  const confirmed = rent.status === 1
   const start = rent.tzid
+  const minutes = confirmed ? rent.days * 24 * 60 : RENT_FIRST_SMS_MINUTES
   const item: Record<string, Json> = {
-    status: 1,
+    status: rent.status,
     extension: rent.extension ? 1 : 0,
     messages: [...rent.messages].reverse().map((m) => ({
       id: m.id,
       service: m.service,
       text: m.text,
-      code: m.code ?? '',
+      // A notice about a prohibited sender carries the integer 0, other SMS a string ('' without a code).
+      code: m.service === NOTIFY ? 0 : (m.code ?? ''),
       created_at: m.created_at,
     })),
     webhook_url: state.webhookUrl,
-    sum: decimal(toMills(rent.sum), 2),
+    sum: stringSum ? decimal(toMills(rent.sum), 2) : rent.sum,
     country: rent.country,
     start_time: stamp(start),
-    stop_time: stamp(start + rent.days * 86_400),
+    stop_time: stamp(start + minutes * 60),
     checked_time: stamp(start),
     number: rent.number,
-    days_autoextend: 0,
-    rent: 1,
+    days_autoextend: rent.initialDays,
+    rent: rent.days,
     tzid: rent.tzid,
-    time: rent.days * 24 * 60,
-    days: rent.days,
-    hours: rent.days * 24,
+    time: minutes,
+    days: confirmed ? rent.days : 0,
+    hours: confirmed ? rent.days * 24 : 0,
     extend: extendable ? { ...tariff.days } : [],
-    checked: true,
-    reload: null,
+    checked: confirmed,
+    reload: rent.country === 7 ? 0 : null,
     day_extend: extendable ? (tariff.days[1] ?? 0) : 0,
     m_ext: false,
     freeze: false,
   }
-  if (req.query.number !== undefined) item.time_seconds = rent.days * 86_400
+  if (req.query.number !== undefined) {
+    item.time_seconds = minutes * 60
+    item.guard_interval_remaining_seconds = !confirmed && !rent.messages.length ? state.guardInterval : 0
+  }
   return item
 }
 
 const getRentNum: Handler = (state, req) => {
   const country = int(req, 'country', 7)
   const tariff = state.rentTariffs[country]
-  if (!tariff) return error('NO_COUNTRY')
+  if (!tariff) return error('UNDEFINED_COUNTRY')
   const days = int(req, 'days', 1)
   const price = tariff.days[days]
   if (price === undefined) return error('UNDEFINED_DAYS')
   if (state.available < toMills(price)) return error('WARNING_LOW_BALANCE')
   const tzid = state.nextId()
-  state.balance -= toMills(price)
+  // Reserved, not charged: the first SMS that is not `notify` confirms the rent and charges it.
+  state.frozen += toMills(price)
   const rent: MockRent = {
     tzid,
     country,
     number: MockState.shortNumber(tzid),
     days,
+    initialDays: days,
+    status: 0,
     sum: price,
     // `extension` defaults to 1 on the server; `0` makes the rent non-extendable for good.
     extension: req.query.extension !== '0',
@@ -256,17 +286,17 @@ const getRentState: Handler = (state, req) => {
   const tzid = req.query.tzid === undefined ? undefined : int(req, 'tzid', -1)
   const rents = tzid === undefined ? [...state.rents.values()] : [state.rents.get(tzid)].filter((r) => r !== undefined)
   for (const rent of rents) state.poll(rent.tzid)
-  return { response: 1, list: rents.map((r) => rentItem(state, r, req)) }
+  return { response: 1, list: rents.map((r) => rentItem(state, r, req, true)) }
 }
 
 const extendRentState: Handler = (state, req) => {
+  // Every refusal is TRY_AGAIN_LATER, like the backend: unknown tzid, unconfirmed rent, not extendable, unknown days.
   const rent = state.rents.get(int(req, 'tzid', 0))
-  if (!rent) return error('ERROR_WRONG_TZID')
-  const tariff = state.rentTariffs[rent.country]
-  if (!rent.extension || tariff?.extend !== 1) return error('TRY_AGAIN_LATER')
+  const tariff = rent && state.rentTariffs[rent.country]
+  if (!rent || !tariff || rent.status !== 1 || !rent.extension || tariff.extend !== 1) return error('TRY_AGAIN_LATER')
   const days = int(req, 'days', 1)
   const price = tariff.days[days]
-  if (price === undefined) return error('UNDEFINED_DAYS')
+  if (price === undefined) return error('TRY_AGAIN_LATER')
   if (state.available < toMills(price)) return error('WARNING_LOW_BALANCE')
   state.balance -= toMills(price)
   rent.days += days
@@ -276,7 +306,16 @@ const extendRentState: Handler = (state, req) => {
 
 const closeRentNum: Handler = (state, req) => {
   const tzid = int(req, 'tzid', 0)
-  if (!state.rents.delete(tzid)) return error('ERROR_WRONG_TZID')
+  const rent = state.rents.get(tzid)
+  if (!rent) return error('ERROR_NO_OPERATIONS')
+  if (rent.status === 0) {
+    // `guardInterval` stands in for the backend's first 120 s, during which a rent without any SMS stays open.
+    if (!rent.messages.length && state.guardInterval > 0) return error('NO_COMPLETE_TZID')
+    // Unconfirmed (no SMS or only `notify`): the reservation is released.
+    state.frozen -= toMills(rent.sum)
+  }
+  // A confirmed rent closes without a refund.
+  state.rents.delete(tzid)
   state.scheduled.delete(tzid)
   return { response: '1' }
 }
@@ -336,20 +375,14 @@ const getProfile: Handler = (state) => ({
   },
 })
 
-function isHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value)
-    return (url.protocol === 'http:' || url.protocol === 'https:') && url.hostname !== ''
-  } catch {
-    return false
-  }
-}
+/** The backend accepts any `scheme://…` URL. */
+const isUrl = (value: string): boolean => /^[a-z][a-z0-9+.-]*:\/\/\S+$/i.test(value)
 
 const profile: Handler = (state, req) => {
   const body = req.body as { profile?: { webhook_url?: unknown } } | undefined
   if (req.method !== 'POST' || typeof body?.profile !== 'object' || body.profile === null) return error('ERROR_PARAMS')
   const url = body.profile.webhook_url
-  if (url !== null && url !== undefined && (typeof url !== 'string' || !isHttpUrl(url))) {
+  if (url !== null && url !== undefined && (typeof url !== 'string' || !isUrl(url))) {
     return { response: { webhook_url: ['The webhook url must be a valid URL.'] } }
   }
   if (url !== undefined) state.webhookUrl = url
@@ -365,12 +398,18 @@ const getPaymentHistory: Handler = (_state, req) => ({
   response: '1',
   orders: paginate([], int(req, 'page', 1), 10, 'getPaymentHistory.php'),
   paylist: [],
-  domains: [],
+  domains: ['onlinesim.io'],
+  forms: { 1: 'Card' },
   currency: { USD: 1 },
+  buttons: { USD: [5, 10, 20] },
 })
 
 // ----- free -----
 
+/** `ignore` of getFreeList: a note about prohibited services and their ids. */
+const FREE_IGNORE = '<p>Messages from these services are not shown:</p><p>1,2,3</p>'
+
+// Country 44 first, like the backend's list.
 const FREE: Record<number, { name: string; text: string; numbers: Record<string, Array<[sender: string, text: string]>> }> = {
   44: {
     name: 'united_kingdom',
@@ -386,9 +425,11 @@ const FREE: Record<number, { name: string; text: string; numbers: Record<string,
 }
 
 const getFreeList: Handler = (_state, req) => {
-  const codes = Object.keys(FREE).map(Number)
+  const codes = [44, 7] // the backend lists 44 first; numeric object keys would sort 7 first
   const wanted = int(req, 'country', 44)
   const country = FREE[wanted] ? wanted : codes[0]!
+  const count = Math.min(500, Math.max(10, int(req, 'count', 10)))
+  const page = Math.max(1, int(req, 'page', 1))
   const data = FREE[country]!
   const numbers = Object.fromEntries(
     Object.keys(data.numbers).map((n) => [
@@ -402,7 +443,7 @@ const getFreeList: Handler = (_state, req) => {
     text,
     in_number: sender,
     my_number: number,
-    created_at: stamp(i),
+    created_at: iso(i),
     data_humans: '1 day ago',
     code: extractCode(text) ?? '-',
   }))
@@ -410,7 +451,9 @@ const getFreeList: Handler = (_state, req) => {
     response: 1,
     countries: codes.map((c) => ({ country: c, country_text: FREE[c]!.text, country_original: FREE[c]!.name })),
     numbers,
-    messages: { ...paginate(messages, int(req, 'page', 1), int(req, 'count', 10), 'getFreeList'), number, country },
+    messages: { ...paginate(messages, page, count, 'getFreeList'), number, country },
+    ignore: FREE_IGNORE,
+    content: null,
   }
 }
 

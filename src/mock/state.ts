@@ -25,7 +25,10 @@ export interface MockOptions {
   prices?: MockPrices
   /** Rent tariffs; replaces the defaults. */
   rentTariffs?: Record<number, MockRentTariff>
-  /** Guard interval of new operations, seconds. `> 0`: an operation without SMS cannot be closed (`NO_COMPLETE_TZID`). Default `0`. */
+  /**
+   * Guard interval of new operations and rents, seconds. `> 0`: an operation without SMS, or an unconfirmed rent without
+   * any SMS, cannot be closed (`NO_COMPLETE_TZID`). Default `0`.
+   */
   guardInterval?: number
 }
 
@@ -35,6 +38,8 @@ export interface MockSms {
   text: string
   /** Code extracted from `text` (first run of 4–8 digits), `null` when there is none. */
   code: string | null
+  /** Seconds after the mock epoch when it arrived. */
+  at: number
 }
 
 /** A number operation as the mock stores it. */
@@ -58,13 +63,21 @@ export interface MockRent {
   country: number
   /** Number without the country code, as the backend sends it for rents. */
   number: string
+  /** Total rent days: the initial period plus extensions. */
   days: number
-  /** Total paid, USD. */
+  /** The initial period (`days` of getRentNum). */
+  initialDays: number
+  /** `0`: reserved, waiting for the first SMS; `1`: confirmed by an SMS that is not `notify`, price charged. */
+  status: 0 | 1
+  /** Total cost incl. extensions, USD. Frozen while `status` is 0. */
   sum: number
   extension: boolean
   /** Oldest first. */
   messages: Array<MockSms & { id: number; created_at: string }>
 }
+
+/** Sender of a rent SMS from a prohibited sender: it gets the integer `code` `0` and does not confirm the rent. */
+export const NOTIFY = 'notify'
 
 /** One request the mock received. */
 export interface MockRequest {
@@ -81,7 +94,7 @@ export interface MockWebhookLog {
   user_id: number
   webhook_url: string
   type: 'receiving_sms' | 'rent_sms'
-  params: Record<string, string | number | null>
+  params: Record<string, string | number>
   status: 'success'
   error: null
   created_at: string
@@ -110,6 +123,8 @@ export const DEFAULT_RENT_TARIFFS: Record<number, MockRentTariff> = {
 export const MOCK_USER_ID = 1
 /** Seconds an operation stays open, as reported in `time`. The mock has no clock, so it never runs down. */
 export const OPERATION_TIME = 1200
+/** Minutes an unconfirmed rent waits for its first SMS (`stop_time` = start + this). */
+export const RENT_FIRST_SMS_MINUTES = 20
 
 // 2026-01-01 00:00:00 UTC. A literal, not `Date.UTC(...)`: a top-level call would defeat tree-shaking.
 const EPOCH = 1_767_225_600_000
@@ -139,7 +154,7 @@ export class MockState {
 
   /** Total balance incl. the frozen part, mills. */
   balance = 0
-  /** Frozen by open operations, mills. */
+  /** Frozen by open operations and unconfirmed rents, mills. */
   frozen = 0
   operations = new Map<number, MockOperation>()
   rents = new Map<number, MockRent>()
@@ -202,21 +217,30 @@ export class MockState {
 
   /** An SMS arrives at operation or rent `tzid` now. Returns `false` when there is no open one. */
   deliver(tzid: number, text: string, service?: string): boolean {
-    const sms: MockSms = { service: '', text, code: extractCode(text) }
     const op = this.operations.get(tzid)
     if (op && op.status !== 'TZ_OVER_OK') {
-      sms.service = service ?? op.service
+      const sms: MockSms = { service: service ?? op.service, text, code: extractCode(text), at: this.seq }
       op.messages.push(sms)
       op.status = 'TZ_NUM_ANSWER'
-      this.#webhook('receiving_sms', tzid, op.country, op.number, sms)
+      // Activation: `+<digits>`, seconds left, the order time.
+      this.#webhook('receiving_sms', tzid, op.country, op.number, sms, OPERATION_TIME, stamp(op.tzid))
       return true
     }
     const rent = this.rents.get(tzid)
     if (rent) {
-      sms.service = service ?? 'other'
       const id = this.nextId()
+      const sms: MockSms = { service: service ?? 'other', text, code: extractCode(text), at: id }
       rent.messages.push({ ...sms, id, created_at: stamp(id) })
-      this.#webhook('rent_sms', tzid, rent.country, rent.number, sms)
+      if (rent.status === 0 && sms.service !== NOTIFY) {
+        // The first real SMS confirms the rent: the reservation is charged.
+        const cost = toMills(rent.sum)
+        this.frozen -= cost
+        this.balance -= cost
+        rent.status = 1
+      }
+      // Rent: full number in digits without `+`, minutes left, the SMS time.
+      const minutesLeft = rent.status === 1 ? rent.days * 24 * 60 : RENT_FIRST_SMS_MINUTES
+      this.#webhook('rent_sms', tzid, rent.country, `${rent.country}${rent.number}`, sms, minutesLeft, stamp(id))
       return true
     }
     return false
@@ -242,10 +266,18 @@ export class MockState {
   }
 
   /** No HTTP call: the mock only records what the backend would have sent. */
-  #webhook(type: MockWebhookLog['type'], tzid: number, country: number, number: string, sms: MockSms): void {
+  #webhook(
+    type: MockWebhookLog['type'],
+    tzid: number,
+    country: number,
+    number: string,
+    sms: MockSms,
+    timeLeft: number,
+    timeStart: string,
+  ): void {
     if (!this.webhookUrl) return
     const id = this.webhookLogs.length + 1
-    const time = stamp(this.seq)
+    const time = stamp(sms.at)
     this.webhookLogs.push({
       id,
       user_id: MOCK_USER_ID,
@@ -259,9 +291,9 @@ export class MockState {
         number,
         sender: sms.service,
         message: sms.text,
-        code: sms.code,
-        time_start: time,
-        time_left: OPERATION_TIME,
+        code: sms.code ?? '',
+        time_start: timeStart,
+        time_left: timeLeft,
       },
       status: 'success',
       error: null,

@@ -82,7 +82,24 @@ describe('waitCode', () => {
     expect(t.log).toEqual(['state 7 code=true', 'sleep 5000', 'state 7 code=true', 'close 7'])
   })
 
-  it('raises any ApiError at once', async () => {
+  it.each(['TRY_AGAIN_LATER', 'ERROR_UNDEFINED', 'INTERVAL_CONCURRENT_REQUESTS_ERROR'])('retries ApiError %s until the code arrives', async (code) => {
+    const t = setup([new ApiError(code), { msg: '42' }])
+    await expect(waitCode(t.numbers, 7, { sleep: t.sleep, now: t.now })).resolves.toBe('42')
+    expect(t.log).toEqual(['state 7 code=true', 'sleep 5000', 'state 7 code=true', 'close 7'])
+  })
+
+  it('a retryable ApiError still ends in TimeoutError at the deadline', async () => {
+    const t = setup(Array.from({ length: 10 }, () => new ApiError('TRY_AGAIN_LATER')))
+    const error = await waitCode(t.numbers, 7, { interval: 5000, timeout: 10_000, sleep: t.sleep, now: t.now }).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(TimeoutError)
+  })
+
+  it('an operation without `response` (no number issued yet) keeps polling', async () => {
+    const t = setup([{ response: undefined }, { msg: '77' }])
+    await expect(waitCode(t.numbers, 7, { sleep: t.sleep, now: t.now })).resolves.toBe('77')
+  })
+
+  it('raises any other ApiError at once', async () => {
     const t = setup([new ApiError('ERROR_NO_OPERATIONS')])
     await expect(waitCode(t.numbers, 7, { sleep: t.sleep, now: t.now })).rejects.toMatchObject({ code: 'ERROR_NO_OPERATIONS' })
     expect(t.log).toEqual(['state 7 code=true'])

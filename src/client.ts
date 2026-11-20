@@ -100,7 +100,8 @@ export class OnlineSim {
     } catch {
       throw new TransportError(`HTTP ${status}: response is not JSON`, status, text.slice(0, BODY_EXCERPT))
     }
-    // The body is checked before the status: a wrong key is HTTP 456 with {"response":"ERROR_WRONG_KEY"}.
+    // The body is checked before the status: a wrong key is HTTP 456 with {"response":"ERROR_WRONG_KEY"},
+    // the rate limit HTTP 429 with {"response":"TRY_AGAIN_LATER"}.
     if (isObject(data) && 'response' in data) return unwrap(data) as T
     if (status < 200 || status >= 300) throw new TransportError(`HTTP ${status}`, status, text.slice(0, BODY_EXCERPT))
     return data as T
@@ -119,7 +120,7 @@ function unwrap(data: Record<string, unknown>): Record<string, unknown> {
   const code = String(response)
   // Debug backends echo the code as `message`; prefer the readable fallback then.
   const message = typeof rest.message === 'string' && rest.message !== code ? rest.message : undefined
-  if (code === 'NO_NUMBER' || code === 'NO_NUMBER_FOR_FORWARD') throw new NoNumberError(code, message)
+  if (code === 'NO_NUMBER') throw new NoNumberError(code, message)
   throw new ApiError(code, message)
 }
 

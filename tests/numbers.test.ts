@@ -92,6 +92,24 @@ describe('numbers', () => {
     expect(query(last())).toEqual({ tzid: '1520', ban: '1' })
   })
 
+  it('ban after an SMS: "0" surfaces as ApiError("0") with a readable message', async () => {
+    const { client } = fakeClient([{ json: { response: '0' } }])
+    await expect(client.numbers.ban(1520)).rejects.toMatchObject({ code: '0', message: 'Ban not applied: the operation already has an SMS' })
+  })
+
+  it('next accepts the {"tzid":"N","response":"1"} answer; ERROR_WRONG_TZID for a foreign tzid', async () => {
+    const { client } = fakeClient([{ json: { tzid: '1520', response: '1' } }, { json: { response: 'ERROR_WRONG_TZID' } }])
+    await expect(client.numbers.next(1520)).resolves.toBe(true)
+    await expect(client.numbers.next(1)).rejects.toMatchObject({ code: 'ERROR_WRONG_TZID' })
+  })
+
+  it('stateOne accepts an operation without `response`', async () => {
+    const { client } = fakeClient([{ json: [{ tzid: 5, country: 7, service: 'vkcom', sum: 0.5, time: 900, form: 'index' }] }])
+    const op = await client.numbers.stateOne(5)
+    expect(op.tzid).toBe(5)
+    expect(op.response).toBeUndefined()
+  })
+
   it('close surfaces NO_COMPLETE_TZID', async () => {
     const { client } = fakeClient([{ json: { response: 'NO_COMPLETE_TZID' } }])
     await expect(client.numbers.close(1)).rejects.toMatchObject({ code: 'NO_COMPLETE_TZID' })

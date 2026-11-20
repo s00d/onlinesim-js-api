@@ -117,7 +117,7 @@ waitCode(tzid: number, options?: WaitCodeOptions): Promise<string>
 | `since` | `string \| null` | `null` | Ignore this value (the previous code). |
 | `sleep`, `now` | functions | real timers | Injectable for tests. |
 
-A transient `TransportError` is retried until the timeout; any `ApiError` is thrown at once.
+Transient errors are retried until the timeout: `TransportError`, and `ApiError` `TRY_AGAIN_LATER` (the HTTP 429 rate limit), `ERROR_UNDEFINED` and `INTERVAL_CONCURRENT_REQUESTS_ERROR`. Any other `ApiError` is thrown at once.
 
 ```ts
 const first = await client.numbers.waitCode(tzid, { keepOpen: true })
@@ -137,6 +137,8 @@ next(tzid: number): Promise<true>
 ```ts
 await client.numbers.next(tzid)
 ```
+
+Errors: `ApiError` `ERROR_WRONG_TZID` (not an operation of your account), `ERROR_NO_TZID`.
 
 ## close
 
@@ -164,7 +166,7 @@ ban(tzid: number): Promise<true>
 await client.numbers.ban(tzid)
 ```
 
-Errors: as `close`.
+Errors: as `close`; `ApiError` with code `"0"` when the operation already has an SMS — nothing is changed then.
 
 ## tariffs
 

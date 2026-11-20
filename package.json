@@ -1,6 +1,6 @@
 {
   "name": "onlinesim-js-api",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Typed, zero-dependency client for the OnlineSim API (SMS numbers, rent, account, free numbers)",
   "type": "module",
   "main": "./dist/index.cjs",
