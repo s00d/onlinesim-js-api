@@ -1,0 +1,17 @@
+# onlinesim-js-api
+
+> Typed, zero-dependency JavaScript/TypeScript client for the OnlineSim API.
+
+## Documentation Sets
+
+- [onlinesim-js-api — full docs](https://s00d.github.io/onlinesim-js-api/llms-full.txt): Complete documentation of the onlinesim-js-api SDK.
+
+## Documentation
+
+- [Changelog](https://s00d.github.io/onlinesim-js-api/raw/changelog.md): Release notes of onlinesim-js-api.
+- [Free numbers](https://s00d.github.io/onlinesim-js-api/raw/free.md): Public numbers and their SMS — client.free. No API key needed.
+- [Numbers](https://s00d.github.io/onlinesim-js-api/raw/numbers.md): Order a number, read its SMS, close it — client.numbers.
+- [Rent](https://s00d.github.io/onlinesim-js-api/raw/rent.md): Rent a number for days and receive every SMS sent to it — client.rent.
+- [Testing](https://s00d.github.io/onlinesim-js-api/raw/testing.md): Test your integration offline with MockOnlineSim — no network, key or money.
+- [User](https://s00d.github.io/onlinesim-js-api/raw/user.md): Balance, profile, payments and the webhook URL — client.user.
+- [Webhooks](https://s00d.github.io/onlinesim-js-api/raw/webhooks.md): Receive SMS as HTTP callbacks and parse them with parseWebhook.
