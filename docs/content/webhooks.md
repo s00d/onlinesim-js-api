@@ -40,9 +40,9 @@ createServer((req, res) => {
 | `operation_id` | `number \| null` | `tzid` of the operation or rent. |
 | `user_id` | `number \| null` | Account id. |
 | `country_code` | `number \| null` | Country code of the number. |
-| `number` | `string \| null` | The number, e.g. `+79001234567`. |
+| `number` | `string \| null` | Numbers: `+` and the full number (`+79001234567`), or `hidden`. Rent: the full number in digits without `+` (`79001234567`). |
 | `sender` | `string \| null` | Sender of the SMS, e.g. `VK`. |
 | `message` | `string \| null` | Full SMS text. |
-| `code` | `string \| null` | Code extracted from the SMS. |
-| `time_start` | `string \| null` | Start of the operation. |
-| `time_left` | `number \| null` | Time left. |
+| `code` | `string \| null` | Code extracted from the SMS; `''` when none was found. |
+| `time_start` | `string \| null` | Numbers: when the operation was ordered. Rent: when the SMS arrived. `YYYY-MM-DD HH:MM:SS`. |
+| `time_left` | `number \| null` | Time left: seconds for numbers, minutes for rent. |

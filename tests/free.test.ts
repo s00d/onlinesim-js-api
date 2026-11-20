@@ -14,6 +14,12 @@ describe('free', () => {
     expect(list.messages.data[0]?.code).toBe('195895')
   })
 
+  it('list accepts null country_text / country_original', async () => {
+    const body = { response: 1, countries: [{ country: 999, country_text: null, country_original: null }], numbers: [], messages: { data: [] } }
+    const { client } = fakeClient([{ json: body }])
+    expect((await client.free.list()).countries[0]).toEqual({ country: 999, country_text: null, country_original: null })
+  })
+
   it('list normalises [] numbers', async () => {
     const { client, last } = fakeClient([{ json: { response: 1, countries: [], numbers: [], messages: { data: [] } } }])
     await expect(client.free.list()).resolves.toMatchObject({ numbers: {} })

@@ -1,5 +1,5 @@
 import type { RequestFn } from './client'
-import { map, num } from './normalize'
+import { num } from './normalize'
 import type { Balance, Paginator, PaymentHistory, Profile, WebhookLog } from './types'
 
 /** Account: `client.user`. */
@@ -10,7 +10,7 @@ export class UserApi {
     this.#request = request
   }
 
-  /** Balance in USD. `balance` includes the frozen `zbalance`: available = balance − zbalance. */
+  /** Balance in USD. `balance` includes the frozen `zbalance`: available = balance − max(zbalance, 0). */
   async balance(): Promise<Balance> {
     const res = await this.#request<{ balance: string | number; zbalance: number | string; income?: number | string }>(
       'getBalance.php',
@@ -30,8 +30,8 @@ export class UserApi {
 
   /** Top-up orders (paginated, newest first) and the available payment methods. */
   async paymentHistory(page = 1): Promise<PaymentHistory> {
-    const res = await this.#request<PaymentHistory>('getPaymentHistory.php', { query: { page } })
-    return { ...res, paylist: map(res.paylist) }
+    // `paylist` stays as sent: a non-empty JSON array is real data (ids 0..n), not PHP's empty map.
+    return this.#request<PaymentHistory>('getPaymentHistory.php', { query: { page } })
   }
 
   /** Set the URL that receives SMS webhooks. Throws `ApiError('VALIDATION_ERROR')` for an invalid URL. */

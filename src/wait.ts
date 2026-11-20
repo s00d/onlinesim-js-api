@@ -2,13 +2,17 @@ import { ApiError, TimeoutError, TransportError } from './errors'
 import type { NumbersApi } from './numbers'
 import type { Operation, WaitCodeOptions } from './types'
 
+/** Error codes that mean "try again": rate limit (HTTP 429), a transient server error, too many requests. */
+const RETRYABLE = new Set(['TRY_AGAIN_LATER', 'ERROR_UNDEFINED', 'INTERVAL_CONCURRENT_REQUESTS_ERROR'])
+
 const realSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 /**
  * Poll `stateOne(tzid)` every `interval` ms until a code different from `since` arrives, then `close`
  * (or `next` with `keepOpen`) and return it. A finished operation (TZ_OVER_OK, ERROR_NO_ITEMS) without a
  * new code throws `ApiError` with that state as the code; running out of `timeout` throws `TimeoutError`.
- * `TransportError` is retried until the timeout; any `ApiError` is thrown at once.
+ * `TransportError` and the transient `ApiError` codes `TRY_AGAIN_LATER`, `ERROR_UNDEFINED` and
+ * `INTERVAL_CONCURRENT_REQUESTS_ERROR` are retried until the timeout; any other `ApiError` is thrown at once.
  */
 export async function waitCode(
   numbers: Pick<NumbersApi, 'stateOne' | 'close' | 'next'>,
@@ -29,7 +33,8 @@ export async function waitCode(
     try {
       op = await numbers.stateOne(tzid, { messageToCode: !fullMessage })
     } catch (error) {
-      if (!(error instanceof TransportError)) throw error
+      const transient = error instanceof TransportError || (error instanceof ApiError && RETRYABLE.has(error.code))
+      if (!transient) throw error
     }
 
     if (op) {

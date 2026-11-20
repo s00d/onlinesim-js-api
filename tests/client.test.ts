@@ -53,9 +53,17 @@ describe('response handling', () => {
     expect(error).toMatchObject({ code: 'NO_NUMBER', message: 'No numbers available for this service right now' })
   })
 
-  it('maps NO_NUMBER_FOR_FORWARD to NoNumberError', async () => {
-    const { client } = fakeClient([{ json: { response: 'NO_NUMBER_FOR_FORWARD' } }])
-    await expect(client.numbers.get('google')).rejects.toBeInstanceOf(NoNumberError)
+  it('maps HTTP 429 TRY_AGAIN_LATER (rate limit) to ApiError, not TransportError', async () => {
+    const { client } = fakeClient([{ status: 429, json: { response: 'TRY_AGAIN_LATER' } }])
+    const error = await client.numbers.state().catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error).not.toBeInstanceOf(TransportError)
+    expect(error).toMatchObject({ code: 'TRY_AGAIN_LATER' })
+  })
+
+  it('maps a missing key (HTTP 200 ERROR_WRONG_KEY) to ApiError', async () => {
+    const { client } = fakeClient([{ json: { response: 'ERROR_WRONG_KEY' } }], { apiKey: undefined })
+    await expect(client.user.balance()).rejects.toMatchObject({ code: 'ERROR_WRONG_KEY', message: 'Wrong or missing API key' })
   })
 
   it('maps HTTP 456 ERROR_WRONG_KEY to ApiError, not TransportError (body before status)', async () => {
@@ -63,7 +71,7 @@ describe('response handling', () => {
     const error = await client.user.balance().catch((e: unknown) => e)
     expect(error).toBeInstanceOf(ApiError)
     expect(error).not.toBeInstanceOf(TransportError)
-    expect(error).toMatchObject({ code: 'ERROR_WRONG_KEY', message: 'Wrong API key' })
+    expect(error).toMatchObject({ code: 'ERROR_WRONG_KEY', message: 'Wrong or missing API key' })
   })
 
   it('prefers the server message, but not when it only echoes the code', async () => {

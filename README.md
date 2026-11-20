@@ -16,7 +16,7 @@ import { OnlineSim } from 'onlinesim-js-api'
 const client = new OnlineSim({ apiKey: process.env.ONLINESIM_KEY })
 
 const { balance, zbalance } = await client.user.balance()
-console.log(`available: ${balance - zbalance} USD`)
+console.log(`available: ${balance - Math.max(zbalance, 0)} USD`)
 
 const { tzid, number } = await client.numbers.getWithNumber('google', 44)
 console.log(`enter ${number} in the app`)

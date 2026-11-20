@@ -13,11 +13,11 @@ Balance in USD.
 balance(): Promise<{ balance: number; zbalance: number; income?: number }>
 ```
 
-`balance` includes the sum frozen by numbers in progress (`zbalance`): available = `balance − zbalance`. `income` is the partner income. The server caches the answer for 60 s.
+`balance` includes the sum frozen by numbers and unconfirmed rents in progress (`zbalance`, which may be negative): available = `balance − max(zbalance, 0)`. `income` is the partner income. The server caches the answer for 60 s.
 
 ```ts
 const { balance, zbalance } = await client.user.balance()
-const available = balance - zbalance
+const available = balance - Math.max(zbalance, 0)
 ```
 
 Errors: `ApiError` `ERROR_WRONG_KEY`, `ACCOUNT_BLOCKED`, `API_ACCESS_DISABLED`, `API_ACCESS_IP`.
@@ -44,7 +44,7 @@ Top-up orders (paginated, newest first) and the available payment methods.
 paymentHistory(page = 1): Promise<PaymentHistory>
 ```
 
-`PaymentHistory`: `{ orders: Paginator<PaymentOrder>, paylist, domains?, forms?, currency?, buttons? }`. `PaymentOrder.sum` stays a decimal string (`"89.00"`).
+`PaymentHistory`: `{ orders: Paginator<PaymentOrder>, paylist, domains?, forms?, currency?, buttons? }`. `PaymentOrder.sum` stays a decimal string (`"89.00"`); `currency` and `form_text` may be `null`. `paylist` maps a group id to its payment methods, or is a list when the ids are 0, 1, 2… (the server sends a JSON array then).
 
 ```ts
 const { orders } = await client.user.paymentHistory()

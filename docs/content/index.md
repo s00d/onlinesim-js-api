@@ -31,7 +31,7 @@ import { OnlineSim } from 'onlinesim-js-api'
 const client = new OnlineSim({ apiKey: process.env.ONLINESIM_KEY })
 
 const { balance, zbalance } = await client.user.balance()
-console.log(`available: ${balance - zbalance} USD`)
+console.log(`available: ${balance - Math.max(zbalance, 0)} USD`)
 
 const order = await client.numbers.getWithNumber('google', 44)
 console.log(`enter ${order.number} in the app`)
@@ -66,7 +66,7 @@ const client = new OnlineSim({
 
 Sections: [`client.numbers`](/numbers), [`client.rent`](/rent), [`client.user`](/user), [`client.free`](/free). Webhook bodies are parsed by the standalone [`parseWebhook`](/webhooks).
 
-Returned objects keep the server's snake_case field names. Two things are normalised: money that the server sends as a decimal string (`balance`, rent `sum`) becomes a number, and maps that arrive as an empty PHP array `[]` become `{}`.
+Returned objects keep the server's snake_case field names. Two things are normalised: money that the server sends as a decimal string (`balance`, rent `sum` in `rent.state`) becomes a number, and maps that arrive as an empty PHP array `[]` become `{}`. `paymentHistory().paylist` is left as sent: a JSON array when its ids are 0, 1, 2…
 
 ## Error handling
 
@@ -74,8 +74,8 @@ Every error extends `OnlineSimError`.
 
 | Class | When | Fields |
 |---|---|---|
-| `ApiError` | The API answered with an error code (also a wrong key, HTTP 456). | `code`, `message` |
-| `NoNumberError` | `NO_NUMBER` / `NO_NUMBER_FOR_FORWARD`: no number right now. Subclass of `ApiError`. | `code`, `message` |
+| `ApiError` | The API answered with an error code (also a wrong key, HTTP 456, and the rate limit, HTTP 429 `TRY_AGAIN_LATER`). | `code`, `message` |
+| `NoNumberError` | `NO_NUMBER`: no number right now. Subclass of `ApiError`. | `code`, `message` |
 | `TransportError` | Network error, request timeout, or a body that is not JSON. | `status` (`null` without a response), `body` (first 500 chars) |
 | `TimeoutError` | `waitCode` got no code within its `timeout`. | — |
 

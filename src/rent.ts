@@ -3,7 +3,7 @@ import { ApiError } from './errors'
 import { map, num } from './normalize'
 import type { RentItem, RentTariff } from './types'
 
-/** Server shape before normalisation: `sum` is a decimal string, `extend` may be `[]`. */
+/** Server shape before normalisation: `sum` is a number (getRentNum, extendRentState) or a decimal string (getRentState), `extend` may be `[]`. */
 type RawRentItem = Omit<RentItem, 'sum' | 'extend'> & { sum: string | number; extend: Record<string, number> | [] }
 
 // Always sent: flat `messages` list and `time_seconds`.
